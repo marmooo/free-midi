@@ -3,6 +3,14 @@
 [Free MIDI Search](https://marmooo.github.io/free-midi/) for everyone. Free to
 listen, play, copy, modify, etc.
 
+In order to minimize copyright issues and checks, this site manages music
+according to the longest protection period in the world. Currently, we manage
+music based on the following simple rules.
+
+- died < 1941: 100 years (Mexico Law)
+- died >= 1941: 106 years = US Hire Law (95 years) + JP warttime addition (11
+  years)
+
 ## Build
 
 ```

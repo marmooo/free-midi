@@ -219,10 +219,18 @@ function rowInfoHtml(row) {
   return html;
 }
 
+function toString(data) {
+  if (data) {
+    return data;
+  } else {
+    return "";
+  }
+}
+
 function _detailFormatter(_index, row) {
   const url = encodeURI(`${midiDB}/${row.file}`);
-  const title = encodeURIComponent(row.title);
-  const composer = encodeURIComponent(row.composer);
+  const title = encodeURIComponent(toString(row.title));
+  const composer = encodeURIComponent(toString(row.composer));
   return `
 <div class="row p-2">
   <div class="col-sm">
@@ -235,26 +243,26 @@ function _detailFormatter(_index, row) {
   <div class="col-sm">
     <h5>Music Info</h5>
     <table class="table table-sm table-striped">
-      <tr><th>title</th><td>${row.title}</td></tr>
-      <tr><th>composer</th><td>${row.composer}</td></tr>
-      <tr><th>opus</th><td>${row.opus}</td></tr>
-      <tr><th>lyricist</th><td>${row.lyricist}</td></tr>
-      <tr><th>instruments</th><td>${row.instruments}</td></tr>
-      <tr><th>date</th><td>${row.date}</td></tr>
-      <tr><th>style</th><td>${row.style}</td></tr>
-      <tr><th>arranger</th><td>${row.arranger}</td></tr>
-      <tr><th>source</th><td>${row.source}</td></tr>
+      <tr><th>title</th><td>${toString(row.title)}</td></tr>
+      <tr><th>composer</th><td>${toString(row.composer)}</td></tr>
+      <tr><th>opus</th><td>${toString(row.opus)}</td></tr>
+      <tr><th>lyricist</th><td>${toString(row.lyricist)}</td></tr>
+      <tr><th>instruments</th><td>${toString(row.instruments)}</td></tr>
+      <tr><th>date</th><td>${toString(row.date)}</td></tr>
+      <tr><th>style</th><td>${toString(row.style)}</td></tr>
+      <tr><th>arranger</th><td>${toString(row.arranger)}</td></tr>
+      <tr><th>source</th><td>${toString(row.source)}</td></tr>
     </table>
   </div>
   <div class="col-sm">
     <h5>File Info</h5>
     <table class="table table-sm table-striped">
-      <tr><th>license</th><td>${row.license}</td></tr>
-      <tr><th>download</th><td><a href="${url}">MIDI</a></td></tr>
-      <tr><th>id</th><td>${row.id}</td></tr>
-      <tr><th>maintainer</th><td>${row.maintainer}</td></tr>
-      <tr><th>email</th><td>${row.email}</td></tr>
-      <tr><th>web</th><td>${row.web}</td></tr>
+      <tr><th>license</th><td>${toString(row.license)}</td></tr>
+      <tr><th>download</th><td><a href="${toString(url)}">MIDI</a></td></tr>
+      <tr><th>id</th><td>${toString(row.id)}</td></tr>
+      <tr><th>maintainer</th><td>${toString(row.maintainer)}</td></tr>
+      <tr><th>email</th><td>${toString(row.email)}</td></tr>
+      <tr><th>web</th><td>${toString(row.web)}</td></tr>
     </table>
   </div>
 </div>

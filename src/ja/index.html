@@ -3,11 +3,11 @@
   <head prefix="og: http://ogp.me/ns#">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Free MIDI Search for everyone. Free to listen, copy, modify, etc.">
+    <meta name="description" content="誰でも利用できる無料の MIDI 検索です。視聴・複製・改変等はご自由に。">
     <title>Free MIDI</title>
     <meta property="og:title" content="Free MIDI">
     <meta property="og:site_name" content="Free MIDI">
-    <meta property="og:description" content="Free MIDI Search for everyone. Free to listen, copy, modify, etc.">
+    <meta property="og:description" content="誰でも利用できる無料の MIDI 検索です。視聴・複製・改変等はご自由に。">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://marmooo.github.io/free-midi/">
     <meta property="og:image" content="https://marmooo.github.io/free-midi/favicon/apple-touch-icon.png">
@@ -113,25 +113,25 @@ table.rc-table-resizing thead > th > a {
           </a>
           <div class="navbar-nav">
             <select title="language" id="lang" class="form-select form-select-sm">
-              <option value="ja">日本語</option>
-              <option value="en" selected>English</option>
+              <option value="ja" selected>日本語</option>
+              <option value="en">English</option>
             </select>
-            <button title="toggle dark-mode" id="toggleDarkMode" class="fs-4 btn p-0 ms-1">🌓</button>
+            <button title="ダークモード切替" id="toggleDarkMode" class="fs-4 btn p-0 ms-1">🌓</button>
           </div>
         </div>
       </nav>
     </header>
     <main class="container">
-      <p>Free MIDI Search for everyone. Free to listen, copy, modify, etc.</p>
+      <p>誰でも利用できる無料の MIDI 検索です。視聴・複製・改変等はご自由に。</p>
       <div class="d-flex flex-wrap justify-content-between mb-2">
         <div class="d-flex">
           <div class="d-inline">
-            <button title="speed down" id="speedDown" class="btn btn-sm btn-light"><i class="bi bi-chevron-double-left"></i></button>
-            <input title="speed" id="speed" class="form-control form-control-sm d-inline w-auto text-center" type="number" min="0" step="10" value="100" placeholder="speed">
-            <button title="speed up" id="speedUp" class="btn btn-sm btn-light"><i class="bi bi-chevron-double-right"></i></button>
+            <button title="速度低下" id="speedDown" class="btn btn-sm btn-light"><i class="bi bi-chevron-double-left"></i></button>
+            <input title="速度" id="speed" class="form-control form-control-sm d-inline w-auto text-center" type="number" min="0" step="10" value="100" placeholder="speed">
+            <button title="速度上昇" id="speedUp" class="btn btn-sm btn-light"><i class="bi bi-chevron-double-right"></i></button>
           </div>
-          <button title="repeat" id="repeat" class="btn btn-sm btn-light"><i class="bi bi-repeat"></i></button>
-          <button title="volume ON/OFF" id="volumeOnOff" class="btn btn-sm btn-light"><i class="bi bi-volume-up-fill"></i></button>
+          <button title="リピート再生" id="repeat" class="btn btn-sm btn-light"><i class="bi bi-repeat"></i></button>
+          <button title="音量 ON/OFF" id="volumeOnOff" class="btn btn-sm btn-light"><i class="bi bi-volume-up-fill"></i></button>
           <div class="d-flex align-items-center">
             <input type="range" id="volumebar" class="form-range" min="-50" max="0" value="0" step="1">
           </div>
@@ -144,8 +144,8 @@ table.rc-table-resizing thead > th > a {
           </div>
           <input type="range" id="seekbar" class="form-range">
         </div>
-        <select title="play on selected instrument(s)" id="instruments" class="form-select form-select-sm w-auto">
-          <option>Play on all instruments</option>
+        <select title="楽器を選択して再生" id="instruments" class="form-select form-select-sm w-auto">
+          <option>すべての楽器で再生</option>
         </select>
         <div class="buttons-toolbar ms-1"></div>
       </div>
@@ -161,25 +161,25 @@ table.rc-table-resizing thead > th > a {
             data-resizable="true"
             data-buttons-toolbar=".buttons-toolbar"
             data-detail-view="true"
-            data-detail-formatter="_detailFormatterEn"
+            data-detail-formatter="_detailFormatterJa"
             data-detail-view-icon="true"
-            data-url="/midi-db/en.json">
+            data-url="/midi-db/ja.json">
           <thead class="table-light">
             <tr>
-              <th data-field="tool" data-formatter="_toolFormatterEn" data-events="toolEvents"></th>
-              <th data-field="composer" data-sortable="true" data-filter-control="input">Composer</th>
-              <th data-field="born" data-visible="false" data-sortable="true" data-filter-control="input">Born</th>
-              <th data-field="died" data-visible="false" data-sortable="true" data-filter-control="input">Died</th>
-              <th data-field="country" data-visible="false" data-sortable="true" data-filter-control="input">Country</th>
-              <th data-field="title" data-sortable="true" data-filter-control="input">Title</th>
-              <th data-field="opus" data-sortable="true" data-filter-control="input">Opus</th>
-              <th data-field="lyricist" data-sortable="true" data-filter-control="input">Lyricist</th>
-              <th data-field="instruments" data-visible="false" data-sortable="true" data-filter-control="input">Instruments</th>
-              <th data-field="date" data-visible="false" data-sortable="true" data-filter-control="input">Date</th>
-              <th data-field="style" data-visible="false" data-sortable="true" data-filter-control="select">Style</th>
-              <th data-field="arranger" data-visible="false" data-sortable="true" data-filter-control="input">Arranger</th>
+              <th data-field="tool" data-formatter="_toolFormatterJa" data-events="toolEvents"></th>
+              <th data-field="composer" data-sortable="true" data-filter-control="input">作曲者</th>
+              <th data-field="born" data-visible="false" data-sortable="true" data-filter-control="input">生年</th>
+              <th data-field="died" data-visible="false" data-sortable="true" data-filter-control="input">没年</th>
+              <th data-field="country" data-visible="false" data-sortable="true" data-filter-control="input">国</th>
+              <th data-field="title" data-sortable="true" data-filter-control="input">タイトル</th>
+              <th data-field="opus" data-sortable="true" data-filter-control="input">作品</th>
+              <th data-field="lyricist" data-sortable="true" data-filter-control="input">作詞者</th>
+              <th data-field="instruments" data-visible="false" data-sortable="true" data-filter-control="input">楽器</th>
+              <th data-field="date" data-visible="false" data-sortable="true" data-filter-control="input">日付</th>
+              <th data-field="style" data-visible="false" data-sortable="true" data-filter-control="select">スタイル</th>
+              <th data-field="arranger" data-visible="false" data-sortable="true" data-filter-control="input">編曲者</th>
               <th data-field="id" data-sortable="true" data-filter-control="input">ID</th>
-              <th data-field="difficulty" data-sortable="true" data-filter-control="input">Difficulty</th>
+              <th data-field="difficulty" data-sortable="true" data-filter-control="input">難易度</th>
             </tr>
           </thead>
         </table>
@@ -187,54 +187,54 @@ table.rc-table-resizing thead > th > a {
       <div class="row pt-3">
         <div class="col-sm">
           <div class="card">
-            <h5 class="card-header">Features</h5>
+            <h5 class="card-header">特徴</h5>
             <div class="card-body">
               <ul>
-                <li>listen and download immediately, no login required</li>
-                <li>well-organized and easy to find</li>
-                <li>play back with instrument changes
+                <li>ログイン不要ですぐに視聴してダウンロード</li>
+                <li>整理整頓されており検索が簡単</li>
+                <li>楽器を変更して再生
                   <ul>
-                    <li>Listen on your favorite instrument</li>
-                    <li>Play comfortably even in narrow bandwidth</li>
+                    <li>お気に入りの楽器で視聴</li>
+                    <li>低速帯域でも快適に視聴</li>
                   </ul>
                 </li>
-                <li>generate sheet music from MIDI</li>
+                <li>楽譜は MIDI から自動生成</li>
               </ul>
             </div>
           </div>
         </div>
         <div class="col-sm">
           <div class="card">
-            <h5 class="card-header">Simple license</h5>
+            <h5 class="card-header">シンプルなライセンス</h5>
             <div class="card-body">
-              <p>This repository deals only with MIDI that can be freely listen, copy, modify,
-              etc. Old music is managed according to the longest protection period in the
-              world to minimize copyright issues and checks. Currently, we manage music based
-              on the following simple rules.
+              <p>当サイトでは視聴・複製・改変等が自由な MIDI だけを扱っています。
+              古い音楽については、著作権の問題やチェックを最小限に抑えるため、
+              世界で最も長い保護期間に従って管理しています。
+              現在、以下の簡単なルールに基づいて音楽を管理しています。
               </p>
               <div class="row">
                 <div class="col-lg">
                   <div class="card">
-                    <h6 class="card-header">Japanese music</h6>
+                    <h6 class="card-header">日本の楽曲</h6>
                     <div class="card-body">
                       <dl>
-                        <dt>died &lt; 1969</dt>
-                        <dd>50 years</dd>
-                        <dt>died &gt;= 1969</dt>
-                        <dd>70 years</dd>
+                        <dt>没年 &lt; 1969</dt>
+                        <dd>50 年</dd>
+                        <dt>没年 &gt;= 1969</dt>
+                        <dd>70 年</dd>
                       </dl>
                     </div>
                   </div>
                 </div>
                 <div class="col-lg">
                   <div class="card">
-                    <h6 class="card-header">Others</h6>
+                    <h6 class="card-header">その他</h6>
                     <div class="card-body">
                       <dl>
-                        <dt>died &lt; 1941</dt>
-                        <dd>100 years (Mexico Law)</dd>
-                        <dt>died &gt;= 1941</dt>
-                        <dd>106 years = US Hire Law (95 years) + JP warttime addition (11 years)</dd>
+                        <dt>没年 &lt; 1941</dt>
+                        <dd>100 年 (メキシコの著作権)</dd>
+                        <dt>没年 &gt;= 1941</dt>
+                        <dd>106 年 = 米国の職務著作権 (95 年) + 戦時加算 (11 年)</dd>
                       </dl>
                     </div>
                   </div>

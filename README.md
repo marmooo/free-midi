@@ -3,9 +3,10 @@
 [Free MIDI Search](https://marmooo.github.io/free-midi/) for everyone. Free to
 listen, play, copy, modify, etc.
 
-In order to minimize copyright issues and checks, this site manages music
-according to the longest protection period in the world. Currently, we manage
-music based on the following simple rules.
+This repository deals only with MIDI that can be freely listen, copy, modify,
+etc. Old music is managed according to the longest protection period in the
+world to minimize copyright issues and checks. Currently, we manage music based
+on the following simple rules.
 
 - Japanese music
   - died < 1969: 50 years

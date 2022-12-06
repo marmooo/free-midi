@@ -14,6 +14,12 @@ function toggleDarkMode() {
   }
 }
 
+function changeLang() {
+  const langObj = document.getElementById("lang");
+  const lang = langObj.options[langObj.selectedIndex].value;
+  location.href = `/free-midi/${lang}/`;
+}
+
 function speedDown() {
   const input = document.getElementById("speed");
   const speed = parseInt(input.value) - 10;
@@ -145,13 +151,15 @@ async function playMIDI(event, index, midiUrl) {
 }
 
 function loadInstruments() {
+  const langObj = document.getElementById("lang");
+  const lang = langObj.options[langObj.selectedIndex].value;
   const instruments = document.getElementById("instruments");
-  fetch("instruments.csv")
+  fetch(`/free-midi/${lang}/instruments.lst`)
     .then((response) => response.text())
     .then((text) => {
       text.trimEnd().split("\n").forEach((line) => {
         const option = document.createElement("option");
-        option.textContent = line.split(",")[0];
+        option.textContent = line;
         instruments.appendChild(option);
       });
     });
@@ -227,7 +235,7 @@ function toString(data) {
   }
 }
 
-function _detailFormatter(_index, row) {
+function _detailFormatterEn(_index, row) {
   const url = encodeURI(`${midiDB}/${row.file}`);
   const title = encodeURIComponent(toString(row.title));
   const composer = encodeURIComponent(toString(row.composer));
@@ -236,42 +244,90 @@ function _detailFormatter(_index, row) {
   <div class="col-sm">
     <h5>Play</h5>
     <table class="table table-sm table-striped">
-      <tr><th>score</th><td><a href="https://marmooo.github.io/midi2abc/?url=${url}&title=${title}&composer=${composer}">midi2abc</a></td></tr>
-      <tr><th>game</th><td>TODO</td></tr>
+      <tr><th>Score</th><td><a href="https://marmooo.github.io/midi2abc/?url=${url}&title=${title}&composer=${composer}">midi2abc</a></td></tr>
+      <tr><th>Game</th><td>TODO</td></tr>
     </table>
   </div>
   <div class="col-sm">
     <h5>Music Info</h5>
     <table class="table table-sm table-striped">
-      <tr><th>title</th><td>${toString(row.title)}</td></tr>
-      <tr><th>composer</th><td>${toString(row.composer)}</td></tr>
-      <tr><th>opus</th><td>${toString(row.opus)}</td></tr>
-      <tr><th>lyricist</th><td>${toString(row.lyricist)}</td></tr>
-      <tr><th>instruments</th><td>${toString(row.instruments)}</td></tr>
-      <tr><th>date</th><td>${toString(row.date)}</td></tr>
-      <tr><th>style</th><td>${toString(row.style)}</td></tr>
-      <tr><th>arranger</th><td>${toString(row.arranger)}</td></tr>
-      <tr><th>source</th><td>${toString(row.source)}</td></tr>
+      <tr><th>Title</th><td>${toString(row.title)}</td></tr>
+      <tr><th>Composer</th><td>${toString(row.composer)}</td></tr>
+      <tr><th>Opus</th><td>${toString(row.opus)}</td></tr>
+      <tr><th>Lyricist</th><td>${toString(row.lyricist)}</td></tr>
+      <tr><th>Instruments</th><td>${toString(row.instruments)}</td></tr>
+      <tr><th>Date</th><td>${toString(row.date)}</td></tr>
+      <tr><th>Style</th><td>${toString(row.style)}</td></tr>
+      <tr><th>Arranger</th><td>${toString(row.arranger)}</td></tr>
+      <tr><th>Source</th><td>${toString(row.source)}</td></tr>
     </table>
   </div>
   <div class="col-sm">
     <h5>File Info</h5>
     <table class="table table-sm table-striped">
-      <tr><th>license</th><td>${toString(row.license)}</td></tr>
-      <tr><th>download</th><td><a href="${toString(url)}">MIDI</a></td></tr>
-      <tr><th>id</th><td>${toString(row.id)}</td></tr>
-      <tr><th>maintainer</th><td>${toString(row.maintainer)}</td></tr>
-      <tr><th>email</th><td>${toString(row.email)}</td></tr>
-      <tr><th>web</th><td>${toString(row.web)}</td></tr>
+      <tr><th>License</th><td>${toString(row.license)}</td></tr>
+      <tr><th>Download</th><td><a href="${toString(url)}">MIDI</a></td></tr>
+      <tr><th>ID</th><td>${toString(row.id)}</td></tr>
+      <tr><th>Maintainer</th><td>${toString(row.maintainer)}</td></tr>
+      <tr><th>Email</th><td>${toString(row.email)}</td></tr>
+      <tr><th>Web</th><td>${toString(row.web)}</td></tr>
     </table>
   </div>
 </div>
   `;
 }
 
-function _toolFormatter(_value, _row, _index) {
+function _detailFormatterJa(_index, row) {
+  const url = encodeURI(`${midiDB}/${row.file}`);
+  const title = encodeURIComponent(toString(row.title));
+  const composer = encodeURIComponent(toString(row.composer));
+  return `
+<div class="row p-2">
+  <div class="col-sm">
+    <h5>プレイ</h5>
+    <table class="table table-sm table-striped">
+      <tr><th>楽譜</th><td><a href="https://marmooo.github.io/midi2abc/?url=${url}&title=${title}&composer=${composer}">midi2abc</a></td></tr>
+      <tr><th>ゲーム</th><td>TODO</td></tr>
+    </table>
+  </div>
+  <div class="col-sm">
+    <h5>音楽情報</h5>
+    <table class="table table-sm table-striped">
+      <tr><th>タイトル</th><td>${toString(row.title)}</td></tr>
+      <tr><th>作曲者</th><td>${toString(row.composer)}</td></tr>
+      <tr><th>作品</th><td>${toString(row.opus)}</td></tr>
+      <tr><th>作詞者</th><td>${toString(row.lyricist)}</td></tr>
+      <tr><th>楽器</th><td>${toString(row.instruments)}</td></tr>
+      <tr><th>日付</th><td>${toString(row.date)}</td></tr>
+      <tr><th>スタイル</th><td>${toString(row.style)}</td></tr>
+      <tr><th>編曲者</th><td>${toString(row.arranger)}</td></tr>
+      <tr><th>ソース</th><td>${toString(row.source)}</td></tr>
+    </table>
+  </div>
+  <div class="col-sm">
+    <h5>ファイル情報</h5>
+    <table class="table table-sm table-striped">
+      <tr><th>ライセンス</th><td>${toString(row.license)}</td></tr>
+      <tr><th>ダウンロード</th><td><a href="${toString(url)}">MIDI</a></td></tr>
+      <tr><th>id</th><td>${toString(row.id)}</td></tr>
+      <tr><th>保守者</th><td>${toString(row.maintainer)}</td></tr>
+      <tr><th>Email</th><td>${toString(row.email)}</td></tr>
+      <tr><th>Web</th><td>${toString(row.web)}</td></tr>
+    </table>
+  </div>
+</div>
+  `;
+}
+
+function _toolFormatterEn(_value, _row, _index) {
   return `
 <button title="play" class="btn p-0"><i class="bi bi-play-fill"></i></button>
+  `;
+}
+
+function _toolFormatterJa(_value, _row, _index) {
+  return `
+<button title="再生" class="btn p-0"><i class="bi bi-play-fill"></i></button>
   `;
 }
 
@@ -303,6 +359,7 @@ window.toolEvents = {
 };
 
 document.getElementById("toggleDarkMode").onclick = toggleDarkMode;
+document.getElementById("lang").onchange = changeLang;
 document.getElementById("speedDown").onclick = speedDown;
 document.getElementById("speedUp").onclick = speedUp;
 document.getElementById("repeat").onclick = repeat;

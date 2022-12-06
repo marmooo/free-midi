@@ -240,17 +240,17 @@ function _detailFormatterEn(_index, row) {
   const title = encodeURIComponent(toString(row.title));
   const composer = encodeURIComponent(toString(row.composer));
   return `
-<div class="row p-2">
-  <div class="col-sm">
+<div class="d-flex p-2">
+  <div>
     <h5>Play</h5>
-    <table class="table table-sm table-striped">
+    <table class="table table-sm table-striped w-auto">
       <tr><th>Score</th><td><a href="https://marmooo.github.io/midi2abc/?url=${url}&title=${title}&composer=${composer}">midi2abc</a></td></tr>
       <tr><th>Game</th><td>TODO</td></tr>
     </table>
   </div>
-  <div class="col-sm">
+  <div>
     <h5>Music Info</h5>
-    <table class="table table-sm table-striped">
+    <table class="table table-sm table-striped w-auto">
       <tr><th>Title</th><td>${toString(row.title)}</td></tr>
       <tr><th>Composer</th><td>${toString(row.composer)}</td></tr>
       <tr><th>Opus</th><td>${toString(row.opus)}</td></tr>
@@ -262,9 +262,9 @@ function _detailFormatterEn(_index, row) {
       <tr><th>Source</th><td>${toString(row.source)}</td></tr>
     </table>
   </div>
-  <div class="col-sm">
+  <div>
     <h5>File Info</h5>
-    <table class="table table-sm table-striped">
+    <table class="table table-sm table-striped w-auto">
       <tr><th>License</th><td>${toString(row.license)}</td></tr>
       <tr><th>Download</th><td><a href="${toString(url)}">MIDI</a></td></tr>
       <tr><th>ID</th><td>${toString(row.id)}</td></tr>
@@ -282,17 +282,17 @@ function _detailFormatterJa(_index, row) {
   const title = encodeURIComponent(toString(row.title));
   const composer = encodeURIComponent(toString(row.composer));
   return `
-<div class="row p-2">
-  <div class="col-sm">
+<div class="d-flex p-2">
+  <div>
     <h5>プレイ</h5>
-    <table class="table table-sm table-striped">
+    <table class="table table-sm table-striped w-auto">
       <tr><th>楽譜</th><td><a href="https://marmooo.github.io/midi2abc/?url=${url}&title=${title}&composer=${composer}">midi2abc</a></td></tr>
       <tr><th>ゲーム</th><td>TODO</td></tr>
     </table>
   </div>
-  <div class="col-sm">
+  <div>
     <h5>音楽情報</h5>
-    <table class="table table-sm table-striped">
+    <table class="table table-sm table-striped w-auto">
       <tr><th>タイトル</th><td>${toString(row.title)}</td></tr>
       <tr><th>作曲者</th><td>${toString(row.composer)}</td></tr>
       <tr><th>作品</th><td>${toString(row.opus)}</td></tr>
@@ -304,9 +304,9 @@ function _detailFormatterJa(_index, row) {
       <tr><th>ソース</th><td>${toString(row.source)}</td></tr>
     </table>
   </div>
-  <div class="col-sm">
+  <div>
     <h5>ファイル情報</h5>
-    <table class="table table-sm table-striped">
+    <table class="table table-sm table-striped w-auto">
       <tr><th>ライセンス</th><td>${toString(row.license)}</td></tr>
       <tr><th>ダウンロード</th><td><a href="${toString(url)}">MIDI</a></td></tr>
       <tr><th>id</th><td>${toString(row.id)}</td></tr>

@@ -137,7 +137,7 @@ function initSeekbar(ns) {
 async function playMIDI(event, index, midiUrl) {
   ns = await core.urlToNoteSequence(midiUrl);
   ns.controlChanges.forEach((n) => n.p = n.program);
-  ns.notes.map((note) =>{
+  ns.notes.map((note) => {
     note.p = note.program;
   });
   setNoteInstruments(ns);
@@ -154,14 +154,17 @@ function loadInstruments() {
   const langObj = document.getElementById("lang");
   const lang = langObj.options[langObj.selectedIndex].value;
   const instruments = document.getElementById("instruments");
-  fetch(`/free-midi/${lang}/instruments.lst`)
+  return fetch(`/free-midi/${lang}/instruments.lst`)
     .then((response) => response.text())
     .then((text) => {
+      const list = [];
       text.trimEnd().split("\n").forEach((line) => {
         const option = document.createElement("option");
         option.textContent = line;
         instruments.appendChild(option);
+        list.push(line);
       });
+      return list;
     });
 }
 
@@ -203,7 +206,6 @@ const playerCallback = {
 };
 
 loadConfig();
-loadInstruments();
 const midiDB = "/midi-db";
 const $table = $("#midiList");
 const soundFont =
@@ -357,6 +359,23 @@ window.toolEvents = {
     }
   },
 };
+
+function getInstrumentsString(list, info) {
+  const ids = info.instruments
+    .split(",").map((id) => parseInt(id));
+  return ids.map((id) => list[id]).join(", ");
+}
+
+const insturmentsPromise = loadInstruments();
+$("#midiList").bootstrapTable({
+  onLoadSuccess: function (data) {
+    insturmentsPromise.then((list) => {
+      data.forEach((info) => {
+        info.instruments = getInstrumentsString(list, info);
+      });
+    });
+  },
+});
 
 document.getElementById("toggleDarkMode").onclick = toggleDarkMode;
 document.getElementById("lang").onchange = changeLang;

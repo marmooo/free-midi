@@ -220,15 +220,6 @@ const player = new core.SoundFontPlayer(
 let ns;
 let seeking;
 
-function rowInfoHtml(row) {
-  let html = '<table class="table table-sm table-striped"><tbody>';
-  for (const [k, v] of Object.entries(row)) {
-    html += `<tr><th>${k}</th><td>${v}</td></tr>`;
-  }
-  html += "</tbody></table>";
-  return html;
-}
-
 function toString(data) {
   if (data) {
     return data;

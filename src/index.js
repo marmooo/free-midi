@@ -56,10 +56,9 @@ function changeSpeed() {
         });
         break;
       }
-      case "paused": {
-        speedChanged = true;
+      case "paused":
+        configChanged = true;
         break;
-      }
     }
   }
 }
@@ -230,20 +229,25 @@ function loadInstruments() {
 }
 
 function changeInstruments() {
-  if (player.isPlaying()) {
-    const tbody = $table[0].querySelector("tbody");
-    const currNode = tbody.querySelector(".bi-pause-fill");
-    const index = [...tbody.children].indexOf(currNode);
-    player.stop();
-    setNoteInstruments(ns);
-    setSpeed(ns);
-    const seconds = parseInt(document.getElementById("seekbar").value);
-    player.loadSamples(ns).then(() => {
-      player.start(ns, undefined, seconds).then(() => {
-        playNext(currNode, index);
+  switch (player.getPlayState()) {
+    case "started": {
+      const tbody = $table[0].querySelector("tbody");
+      const currNode = tbody.querySelector(".bi-pause-fill");
+      const index = [...tbody.children].indexOf(currNode);
+      player.stop();
+      setNoteInstruments(ns);
+      setSpeed(ns);
+      const seconds = parseInt(document.getElementById("seekbar").value);
+      player.loadSamples(ns).then(() => {
+        player.start(ns, undefined, seconds).then(() => {
+          playNext(currNode, index);
+        });
+        initSeekbar(ns, seconds);
       });
-      initSeekbar(ns, seconds);
-    });
+    }
+    case "paused":
+      configChanged = true;
+      break;
   }
 }
 
@@ -261,7 +265,7 @@ const player = new core.SoundFontPlayer(
 );
 let ns;
 let nsCache;
-let speedChanged = false;
+let configChanged = false;
 let seekbarInterval;
 
 function toString(data) {
@@ -385,14 +389,14 @@ window.toolEvents = {
       }
       case "bi bi-play": {
         e.target.className = "bi bi-pause-fill";
-        if (speedChanged) {
+        if (configChanged) {
           player.stop();
           const url = `${midiDB}/${row.file}`;
           const seconds = parseInt(document.getElementById("seekbar").value);
           const input = document.getElementById("speed");
           const speed = input.value / 100;
           playMIDI(e, index, url, seconds / speed);
-          speedChanged = false;
+          configChanged = false;
         } else {
           player.resume();
           const seconds = parseInt(document.getElementById("seekbar").value);

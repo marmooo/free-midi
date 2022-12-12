@@ -87,47 +87,33 @@ function setSpeed(ns) {
   }
 }
 
-function changeInstruments() {
+function formatTime(seconds) {
+  seconds = Math.floor(seconds);
+  const s = seconds % 60;
+  const m = (seconds - s) / 60;
+  const h = (seconds - s - 60 * m) / 3600;
+  const ss = String(s).padStart(2, "0");
+  const mm = (m > 9 || !h) ? `${m}:` : `0${m}:`;
+  const hh = h ? `${h}:` : "";
+  return `${hh}${mm}${ss}`;
+}
+
+function changeSeekbar(event) {
+  clearInterval(seekbarInterval);
+  const seconds = parseInt(event.target.value);
+  document.getElementById("currentTime").textContent = formatTime(seconds);
   if (player.isPlaying()) {
-    const tbody = $table[0].querySelector("tbody");
-    const currNode = tbody.querySelector(".bi-pause-fill");
-    const index = [...tbody.children].indexOf(currNode);
-    player.stop();
-    setNoteInstruments(ns);
-    setSpeed(ns);
-    const seconds = parseInt(document.getElementById("seekbar").value);
-    player.loadSamples(ns).then(() => {
-      player.start(ns, undefined, seconds).then(() => playNext(currNode, index));
-      initSeekbar(ns, seconds);
-    });
+    player.seekTo(seconds);
+    setSeekbarInterval(seconds);
+    if (player.getPlayState() == "paused") player.resume();
   }
 }
 
-function playNext(node, index) {
-  node.className = "bi bi-play-fill";
-  const pageData = $table.bootstrapTable("getData", { useCurrentPage: true });
-  if ((index + 1) % pageData.length == 0) {
-    const data = $table.bootstrapTable("getData");
-    if (data.at(-1) == pageData.at(-1)) {
-      const repeatObj = document.getElementById("repeat");
-      const repeat = repeatObj.classList.contains("active");
-      if (repeat) {
-        $table.bootstrapTable("selectPage", 1);
-        const tbody = $table[0].querySelector("tbody");
-        const nextNode = tbody.querySelector(".bi-play-fill");
-        if (nextNode) nextNode.click();
-      }
-    } else {
-      $table.bootstrapTable("nextPage");
-      const tbody = $table[0].querySelector("tbody");
-      const nextNode = tbody.querySelector(".bi-play-fill");
-      if (nextNode) nextNode.click();
-    }
-  } else {
-    const tr = node.parentNode.parentNode.parentNode;
-    const nextNode = tr.nextElementSibling.querySelector(".bi-play-fill");
-    if (nextNode) nextNode.click();
-  }
+function updateSeekbar(seconds) {
+  const seekbar = document.getElementById("seekbar");
+  seekbar.value = seconds;
+  const time = formatTime(seconds);
+  document.getElementById("currentTime").textContent = time;
 }
 
 function initSeekbar(ns, seconds) {
@@ -162,6 +148,33 @@ async function playMIDI(event, index, midiUrl) {
   });
 }
 
+function playNext(node, index) {
+  node.className = "bi bi-play-fill";
+  const pageData = $table.bootstrapTable("getData", { useCurrentPage: true });
+  if ((index + 1) % pageData.length == 0) {
+    const data = $table.bootstrapTable("getData");
+    if (data.at(-1) == pageData.at(-1)) {
+      const repeatObj = document.getElementById("repeat");
+      const repeat = repeatObj.classList.contains("active");
+      if (repeat) {
+        $table.bootstrapTable("selectPage", 1);
+        const tbody = $table[0].querySelector("tbody");
+        const nextNode = tbody.querySelector(".bi-play-fill");
+        if (nextNode) nextNode.click();
+      }
+    } else {
+      $table.bootstrapTable("nextPage");
+      const tbody = $table[0].querySelector("tbody");
+      const nextNode = tbody.querySelector(".bi-play-fill");
+      if (nextNode) nextNode.click();
+    }
+  } else {
+    const tr = node.parentNode.parentNode.parentNode;
+    const nextNode = tr.nextElementSibling.querySelector(".bi-play-fill");
+    if (nextNode) nextNode.click();
+  }
+}
+
 function loadInstruments() {
   const langObj = document.getElementById("lang");
   const lang = langObj.options[langObj.selectedIndex].value;
@@ -180,33 +193,22 @@ function loadInstruments() {
     });
 }
 
-function formatTime(seconds) {
-  seconds = Math.floor(seconds);
-  const s = seconds % 60;
-  const m = (seconds - s) / 60;
-  const h = (seconds - s - 60 * m) / 3600;
-  const ss = String(s).padStart(2, "0");
-  const mm = (m > 9 || !h) ? `${m}:` : `0${m}:`;
-  const hh = h ? `${h}:` : "";
-  return `${hh}${mm}${ss}`;
-}
-
-function changeSeekbar(event) {
-  clearInterval(seekbarInterval);
-  const seconds = parseInt(event.target.value);
-  document.getElementById("currentTime").textContent = formatTime(seconds);
+function changeInstruments() {
   if (player.isPlaying()) {
-    player.seekTo(seconds);
-    setSeekbarInterval(seconds);
-    if (player.getPlayState() == "paused") player.resume();
+    const tbody = $table[0].querySelector("tbody");
+    const currNode = tbody.querySelector(".bi-pause-fill");
+    const index = [...tbody.children].indexOf(currNode);
+    player.stop();
+    setNoteInstruments(ns);
+    setSpeed(ns);
+    const seconds = parseInt(document.getElementById("seekbar").value);
+    player.loadSamples(ns).then(() => {
+      player.start(ns, undefined, seconds).then(() =>
+        playNext(currNode, index)
+      );
+      initSeekbar(ns, seconds);
+    });
   }
-}
-
-function updateSeekbar(seconds) {
-  const seekbar = document.getElementById("seekbar");
-  seekbar.value = seconds;
-  const time = formatTime(seconds);
-  document.getElementById("currentTime").textContent = time;
 }
 
 loadConfig();
@@ -340,7 +342,7 @@ window.toolEvents = {
         if (player.isPlaying()) player.stop();
         e.target.className = "bi bi-pause-fill";
         const url = `${midiDB}/${row.file}`;
-        playMIDI(e, index, url)
+        playMIDI(e, index, url);
         break;
       }
       case "bi bi-play": {

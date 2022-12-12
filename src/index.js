@@ -28,12 +28,62 @@ function speedDown() {
   } else {
     input.value = speed;
   }
+  document.getElementById("speedDown").disabled = true;
+  changeSpeed();
+  document.getElementById("speedDown").disabled = false;
 }
 
 function speedUp() {
   const input = document.getElementById("speed");
   input.value = parseInt(input.value) + 10;
+  document.getElementById("speedUp").disabled = true;
+  changeSpeed();
+  document.getElementById("speedUp").disabled = false;
 }
+
+function changeSpeed() {
+  if (ns) {
+    const tbody = $table[0].querySelector("tbody");
+    const seconds = parseInt(document.getElementById("seekbar").value);
+    switch (player.getPlayState()) {
+      case "started": {
+        const currNode = tbody.querySelector(".bi-pause-fill");
+        const index = [...tbody.children].indexOf(currNode);
+        player.stop();
+        setSpeed(ns);
+        player.start(ns, undefined, seconds).then(() => {
+          playNext(currNode, index);
+        });
+        break;
+      }
+      case "paused": {
+        speedChanged = true;
+        break;
+      }
+    }
+  }
+}
+
+function setSpeed(ns) {
+  const input = document.getElementById("speed");
+  const speed = parseInt(input.value) / 100;
+  const controlChanges = nsCache.controlChanges;
+  ns.controlChanges.forEach((n, i) => {
+    n.time = controlChanges[i].time / speed;
+  });
+  const tempos = nsCache.tempos;
+  ns.tempos.forEach((n, i) => {
+    n.time = tempos[i].time / speed;
+    n.qpm = tempos[i].qpm * speed;
+  });
+  const notes = nsCache.notes;
+  ns.notes.forEach((n, i) => {
+    n.startTime = notes[i].startTime / speed;
+    n.endTime = notes[i].endTime / speed;
+  });
+  ns.totalTime = nsCache.totalTime / speed;
+}
+
 
 function repeat() {
   document.getElementById("repeat").classList.toggle("active");
@@ -69,21 +119,6 @@ function setNoteInstruments(ns) {
   } else {
     ns.controlChanges.forEach((n) => n.program = n.p);
     ns.notes.forEach((n) => n.program = n.p);
-  }
-}
-
-function setSpeed(ns) {
-  const node = document.getElementById("speed");
-  const speed = parseInt(node.value) / 100;
-  if (speed != 1) {
-    ns.controlChanges.forEach((n) => {
-      n.time /= speed;
-    });
-    ns.notes.forEach((n) => {
-      n.startTime /= speed;
-      n.endTime /= speed;
-    });
-    ns.totalTime /= speed;
   }
 }
 
@@ -132,19 +167,22 @@ function setSeekbarInterval(seconds) {
   }, 1000);
 }
 
-async function playMIDI(event, index, midiUrl) {
+async function playMIDI(event, index, midiUrl, seconds) {
   ns = await core.urlToNoteSequence(midiUrl);
+  nsCache = core.sequences.clone(ns);
   ns.controlChanges.forEach((n) => n.p = n.program);
   ns.notes.map((note) => {
     note.p = note.program;
   });
   setNoteInstruments(ns);
   setSpeed(ns);
-  player.loadSamples(ns).then(() => {
+  player.loadSamples(ns, undefined, seconds).then(() => {
     const volume = document.getElementById("volumebar").value;
     player.output.volume.value = volume;
-    player.start(ns).then(() => playNext(event.target, index));
-    initSeekbar(ns, 0);
+    player.start(ns).then(() => {
+      playNext(event.target, index);
+    });
+    initSeekbar(ns, seconds);
   });
 }
 
@@ -203,9 +241,9 @@ function changeInstruments() {
     setSpeed(ns);
     const seconds = parseInt(document.getElementById("seekbar").value);
     player.loadSamples(ns).then(() => {
-      player.start(ns, undefined, seconds).then(() =>
-        playNext(currNode, index)
-      );
+      player.start(ns, undefined, seconds).then(() => {
+        playNext(currNode, index);
+      });
       initSeekbar(ns, seconds);
     });
   }
@@ -224,6 +262,8 @@ const player = new core.SoundFontPlayer(
   undefined,
 );
 let ns;
+let nsCache;
+let speedChanged = false;
 let seekbarInterval;
 
 function toString(data) {
@@ -342,14 +382,24 @@ window.toolEvents = {
         if (player.isPlaying()) player.stop();
         e.target.className = "bi bi-pause-fill";
         const url = `${midiDB}/${row.file}`;
-        playMIDI(e, index, url);
+        playMIDI(e, index, url, 0);
         break;
       }
       case "bi bi-play": {
         e.target.className = "bi bi-pause-fill";
-        player.resume();
-        const seconds = parseInt(document.getElementById("seekbar").value);
-        setSeekbarInterval(seconds);
+        if (speedChanged) {
+          player.stop();
+          const url = `${midiDB}/${row.file}`;
+          const seconds = parseInt(document.getElementById("seekbar").value);
+          const input = document.getElementById("speed");
+          const speed = input.value / 100;
+          playMIDI(e, index, url, seconds / speed);
+          speedChanged = false;
+        } else {
+          player.resume();
+          const seconds = parseInt(document.getElementById("seekbar").value);
+          setSeekbarInterval(seconds);
+        }
         break;
       }
       case "bi bi-pause-fill":
@@ -380,6 +430,7 @@ $("#midiList").bootstrapTable({
 
 document.getElementById("toggleDarkMode").onclick = toggleDarkMode;
 document.getElementById("lang").onchange = changeLang;
+document.getElementById("speed").onchange = changeSpeed;
 document.getElementById("speedDown").onclick = speedDown;
 document.getElementById("speedUp").onclick = speedUp;
 document.getElementById("repeat").onclick = repeat;

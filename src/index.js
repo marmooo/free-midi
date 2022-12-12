@@ -43,14 +43,14 @@ function speedUp() {
 
 function changeSpeed() {
   if (ns) {
-    const tbody = $table[0].querySelector("tbody");
-    const seconds = parseInt(document.getElementById("seekbar").value);
     switch (player.getPlayState()) {
       case "started": {
+        const tbody = $table[0].querySelector("tbody");
         const currNode = tbody.querySelector(".bi-pause-fill");
         const index = [...tbody.children].indexOf(currNode);
         player.stop();
         setSpeed(ns);
+        const seconds = parseInt(document.getElementById("seekbar").value);
         player.start(ns, undefined, seconds).then(() => {
           playNext(currNode, index);
         });

@@ -84,7 +84,6 @@ function setSpeed(ns) {
   ns.totalTime = nsCache.totalTime / speed;
 }
 
-
 function repeat() {
   document.getElementById("repeat").classList.toggle("active");
 }
@@ -160,7 +159,6 @@ function initSeekbar(ns, seconds) {
 }
 
 function setSeekbarInterval(seconds) {
-  const totalTime = ns.totalTime;
   seekbarInterval = setInterval(() => {
     updateSeekbar(seconds);
     seconds += 1;

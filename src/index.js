@@ -54,7 +54,7 @@ function volumeOnOff() {
   }
 }
 
-function setVolumebar() {
+function changeVolumebar() {
   const volumebar = document.getElementById("volumebar");
   const volume = volumebar.value;
   volumebar.dataset.value = volume;
@@ -87,7 +87,7 @@ function setSpeed(ns) {
   }
 }
 
-function setInstruments() {
+function changeInstruments() {
   if (player.isPlaying()) {
     const tbody = $table[0].querySelector("tbody");
     const currNode = tbody.querySelector(".bi-pause-fill");
@@ -95,9 +95,10 @@ function setInstruments() {
     player.stop();
     setNoteInstruments(ns);
     setSpeed(ns);
-    const time = document.getElementById("currentTime").textContent;
+    const seconds = parseInt(document.getElementById("seekbar").value);
     player.loadSamples(ns).then(() => {
-      player.start(ns, undefined, time).then(() => playNext(currNode, index));
+      player.start(ns, undefined, seconds).then(() => playNext(currNode, index));
+      initSeekbar(ns, seconds);
     });
   }
 }
@@ -129,9 +130,20 @@ function playNext(node, index) {
   }
 }
 
-function initSeekbar(ns) {
+function initSeekbar(ns, seconds) {
   document.getElementById("seekbar").max = ns.totalTime;
+  document.getElementById("seekbar").value = seconds;
   document.getElementById("totalTime").textContent = formatTime(ns.totalTime);
+  clearInterval(seekbarInterval);
+  setSeekbarInterval(seconds);
+}
+
+function setSeekbarInterval(seconds) {
+  const totalTime = ns.totalTime;
+  seekbarInterval = setInterval(() => {
+    updateSeekbar(seconds);
+    seconds += 1;
+  }, 1000);
 }
 
 async function playMIDI(event, index, midiUrl) {
@@ -142,11 +154,11 @@ async function playMIDI(event, index, midiUrl) {
   });
   setNoteInstruments(ns);
   setSpeed(ns);
-  initSeekbar(ns);
   player.loadSamples(ns).then(() => {
     const volume = document.getElementById("volumebar").value;
     player.output.volume.value = volume;
     player.start(ns).then(() => playNext(event.target, index));
+    initSeekbar(ns, 0);
   });
 }
 
@@ -179,31 +191,23 @@ function formatTime(seconds) {
   return `${hh}${mm}${ss}`;
 }
 
-function setSeekbar(event) {
-  seeking = true;
-  const time = event.target.value;
-  document.getElementById("currentTime").textContent = formatTime(time);
+function changeSeekbar(event) {
+  clearInterval(seekbarInterval);
+  const seconds = parseInt(event.target.value);
+  document.getElementById("currentTime").textContent = formatTime(seconds);
   if (player.isPlaying()) {
-    player.seekTo(time);
+    player.seekTo(seconds);
+    setSeekbarInterval(seconds);
     if (player.getPlayState() == "paused") player.resume();
   }
-  seeking = false;
 }
 
-function noteCallback(note) {
-  if (player.playing) return;
-  if (seeking) return;
+function updateSeekbar(seconds) {
   const seekbar = document.getElementById("seekbar");
-  seekbar.value = Math.floor(note.startTime);
-  document.getElementById("currentTime").textContent = formatTime(
-    note.startTime,
-  );
+  seekbar.value = seconds;
+  const time = formatTime(seconds);
+  document.getElementById("currentTime").textContent = time;
 }
-
-const playerCallback = {
-  run: (note) => noteCallback(note),
-  stop: () => {},
-};
 
 loadConfig();
 const midiDB = "/midi-db";
@@ -215,10 +219,10 @@ const player = new core.SoundFontPlayer(
   undefined,
   undefined,
   undefined,
-  playerCallback,
+  undefined,
 );
 let ns;
-let seeking;
+let seekbarInterval;
 
 function toString(data) {
   if (data) {
@@ -336,16 +340,20 @@ window.toolEvents = {
         if (player.isPlaying()) player.stop();
         e.target.className = "bi bi-pause-fill";
         const url = `${midiDB}/${row.file}`;
-        playMIDI(e, index, url);
+        playMIDI(e, index, url)
         break;
       }
-      case "bi bi-play":
+      case "bi bi-play": {
         e.target.className = "bi bi-pause-fill";
         player.resume();
+        const seconds = parseInt(document.getElementById("seekbar").value);
+        setSeekbarInterval(seconds);
         break;
+      }
       case "bi bi-pause-fill":
         e.target.className = "bi bi-play";
         player.pause();
+        clearInterval(seekbarInterval);
         break;
     }
   },
@@ -374,6 +382,6 @@ document.getElementById("speedDown").onclick = speedDown;
 document.getElementById("speedUp").onclick = speedUp;
 document.getElementById("repeat").onclick = repeat;
 document.getElementById("volumeOnOff").onclick = volumeOnOff;
-document.getElementById("volumebar").onchange = setVolumebar;
-document.getElementById("seekbar").onchange = setSeekbar;
-document.getElementById("instruments").onchange = setInstruments;
+document.getElementById("volumebar").onchange = changeVolumebar;
+document.getElementById("seekbar").onchange = changeSeekbar;
+document.getElementById("instruments").onchange = changeInstruments;

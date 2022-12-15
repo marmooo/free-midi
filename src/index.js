@@ -283,10 +283,14 @@ function _detailFormatterEn(_index, row) {
   return `
 <div class="d-flex p-2">
   <div>
-    <h5>Play</h5>
+    <h5>Score</h5>
     <table class="table table-sm table-striped w-auto">
-      <tr><th>Score</th><td><a href="https://marmooo.github.io/midi2abc/?url=${url}&title=${title}&composer=${composer}">midi2abc</a></td></tr>
-      <tr><th>Game</th><td>TODO</td></tr>
+      <tr><th>Basic</th><td><a href="https://marmooo.github.io/midi2abc/?url=${url}&title=${title}&composer=${composer}">midi2abc</a></td></tr>
+      <tr><th>Waterfall</th><td><a href="https://marmooo.github.io/waterfall-piano/?url=${url}&title=${title}&composer=${composer}">Waterfall Piano</a></td></tr>
+    </table>
+    <h5 class="pt-3">Game</h5>
+    <table class="table table-sm table-striped w-auto">
+      <tr><th>TODO</th><td>Coming soon.</td></tr>
     </table>
   </div>
   <div>
@@ -325,10 +329,14 @@ function _detailFormatterJa(_index, row) {
   return `
 <div class="d-flex p-2">
   <div>
-    <h5>プレイ</h5>
+    <h5>楽譜</h5>
     <table class="table table-sm table-striped w-auto">
-      <tr><th>楽譜</th><td><a href="https://marmooo.github.io/midi2abc/?url=${url}&title=${title}&composer=${composer}">midi2abc</a></td></tr>
-      <tr><th>ゲーム</th><td>TODO</td></tr>
+      <tr><th>Basic</th><td><a href="https://marmooo.github.io/midi2abc/?url=${url}&title=${title}&composer=${composer}">midi2abc</a></td></tr>
+      <tr><th>Waterfall</th><td><a href="https://marmooo.github.io/waterfall-piano/?url=${url}&title=${title}&composer=${composer}">Waterfall Piano</a></td></tr>
+    </table>
+    <h5 class="pt-3">ゲーム</h5>
+    <table class="table table-sm table-striped w-auto">
+      <tr><th>TODO</th><td>Coming soon.</td></tr>
     </table>
   </div>
   <div>

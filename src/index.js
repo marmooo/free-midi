@@ -276,6 +276,22 @@ function toString(data) {
   }
 }
 
+function _filterRange(text, value, field, data) {
+  switch (text[0]) {
+    case ">":
+      if (text.length == 1) return true;
+      if (parseInt(value) > parseInt(text.slice(1))) return true;
+      return false;
+    case "<":
+      if (text.length == 1) return true;
+      if (parseInt(value) < parseInt(text.slice(1))) return true;
+      return false;
+    default:
+      if (value == text) return true;
+      return false;
+  }
+}
+
 function _detailFormatterEn(_index, row) {
   const url = encodeURI(`${midiDB}/${row.file}`);
   const title = encodeURIComponent(toString(row.title));

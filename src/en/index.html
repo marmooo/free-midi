@@ -169,8 +169,10 @@ table.rc-table-resizing thead > th > a {
             <tr>
               <th data-field="tool" data-formatter="_toolFormatterEn" data-events="toolEvents"></th>
               <th data-field="composer" data-sortable="true" data-filter-control="input">Composer</th>
-              <th data-field="born" data-visible="false" data-sortable="true" data-filter-control="input">Born</th>
-              <th data-field="died" data-visible="false" data-sortable="true" data-filter-control="input">Died</th>
+              <th data-field="born" data-visible="false" data-sortable="true" data-filter-control="input"
+                data-filter-control-placeholder=">1850" data-filter-custom-search="_filterRange">Born</th>
+              <th data-field="died" data-visible="false" data-sortable="true" data-filter-control="input"
+                data-filter-control-placeholder="<1920" data-filter-custom-search="_filterRange">Died</th>
               <th data-field="country" data-visible="false" data-sortable="true" data-filter-control="input">Country</th>
               <th data-field="title" data-sortable="true" data-filter-control="input">Title</th>
               <th data-field="opus" data-sortable="true" data-filter-control="input">Opus</th>
@@ -181,7 +183,8 @@ table.rc-table-resizing thead > th > a {
               <th data-field="arranger" data-visible="false" data-sortable="true" data-filter-control="input">Arranger</th>
               <th data-field="source" data-visible="false" data-sortable="true" data-filter-control="input">Source</th>
               <th data-field="id" data-sortable="true" data-filter-control="input">ID</th>
-              <th data-field="difficulty" data-sortable="true" data-filter-control="input">Difficulty</th>
+              <th data-field="difficulty" data-sortable="true" data-filter-control="input"
+                data-filter-control-placeholder=">200" data-filter-custom-search="_filterRange">Difficulty</th>
             </tr>
           </thead>
         </table>

@@ -169,8 +169,10 @@ table.rc-table-resizing thead > th > a {
             <tr>
               <th data-field="tool" data-formatter="_toolFormatterJa" data-events="toolEvents"></th>
               <th data-field="composer" data-sortable="true" data-filter-control="input">作曲者</th>
-              <th data-field="born" data-visible="false" data-sortable="true" data-filter-control="input">生年</th>
-              <th data-field="died" data-visible="false" data-sortable="true" data-filter-control="input">没年</th>
+              <th data-field="born" data-visible="false" data-sortable="true" data-filter-control="input"
+                data-filter-control-placeholder=">1850" data-filter-custom-search="_filterRange">生年</th>
+              <th data-field="died" data-visible="false" data-sortable="true" data-filter-control="input"
+                data-filter-control-placeholder="<1920" data-filter-custom-search="_filterRange">没年</th>
               <th data-field="country" data-visible="false" data-sortable="true" data-filter-control="input">国</th>
               <th data-field="title" data-sortable="true" data-filter-control="input">タイトル</th>
               <th data-field="opus" data-sortable="true" data-filter-control="input">作品</th>
@@ -181,7 +183,8 @@ table.rc-table-resizing thead > th > a {
               <th data-field="arranger" data-visible="false" data-sortable="true" data-filter-control="input">編曲者</th>
               <th data-field="source" data-visible="false" data-sortable="true" data-filter-control="input">ソース</th>
               <th data-field="id" data-sortable="true" data-filter-control="input">ID</th>
-              <th data-field="difficulty" data-sortable="true" data-filter-control="input">難易度</th>
+              <th data-field="difficulty" data-sortable="true" data-filter-control="input"
+                data-filter-control-placeholder=">200" data-filter-custom-search="_filterRange">難易度</th>
             </tr>
           </thead>
         </table>

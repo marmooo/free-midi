@@ -252,7 +252,7 @@ function changeInstruments() {
 }
 
 loadConfig();
-const midiDB = "/midi-db";
+const midiDB = "https://midi-db.pages.dev";
 const $table = $("#midiList");
 const soundFont =
   "https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus";
@@ -444,15 +444,16 @@ function getInstrumentsString(list, info) {
 }
 
 const insturmentsPromise = loadInstruments();
-$("#midiList").bootstrapTable({
-  onLoadSuccess: function (data) {
+fetch(`${midiDB}/${document.documentElement.lang}.json`)
+  .then((response) => response.json())
+  .then((data) => {
     insturmentsPromise.then((list) => {
       data.forEach((info) => {
         info.instruments = getInstrumentsString(list, info);
       });
     });
-  },
-});
+    $("#midiList").bootstrapTable("load", data);
+  });
 
 document.getElementById("toggleDarkMode").onclick = toggleDarkMode;
 document.getElementById("lang").onchange = changeLang;

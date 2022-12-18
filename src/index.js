@@ -244,6 +244,7 @@ function changeInstruments() {
         });
         initSeekbar(ns, seconds);
       });
+      break;
     }
     case "paused":
       configChanged = true;
@@ -276,7 +277,7 @@ function toString(data) {
   }
 }
 
-function _filterRange(text, value, field, data) {
+function _filterRange(text, value, _field, _data) {
   switch (text[0]) {
     case ">":
       if (text.length == 1) return true;

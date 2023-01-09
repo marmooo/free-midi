@@ -297,6 +297,10 @@ function _detailFormatterEn(_index, row) {
   const url = encodeURI(`${midiDB}/${row.file}`);
   const title = encodeURIComponent(toString(row.title));
   const composer = encodeURIComponent(toString(row.composer));
+  let instruments = "";
+  row.instruments.split(", ").forEach((instrument) => {
+    instruments += `<li>${instrument}</li>`;
+  });
   return `
 <div class="d-flex p-2">
   <div>
@@ -317,7 +321,6 @@ function _detailFormatterEn(_index, row) {
       <tr><th>Composer</th><td>${toString(row.composer)}</td></tr>
       <tr><th>Opus</th><td>${toString(row.opus)}</td></tr>
       <tr><th>Lyricist</th><td>${toString(row.lyricist)}</td></tr>
-      <tr><th>Instruments</th><td>${toString(row.instruments)}</td></tr>
       <tr><th>Date</th><td>${toString(row.date)}</td></tr>
       <tr><th>Style</th><td>${toString(row.style)}</td></tr>
       <tr><th>Arranger</th><td>${toString(row.arranger)}</td></tr>
@@ -335,6 +338,14 @@ function _detailFormatterEn(_index, row) {
       <tr><th>Web</th><td>${toString(row.web)}</td></tr>
     </table>
   </div>
+  <div>
+    <h5>Annotation Info</h5>
+    <table class="table table-sm table-striped w-auto">
+      <tr><th>Difficulty</th><td>${row.difficulty}</td></tr>
+      <tr><th>BPM</th><td>${row.bpm}</td></tr>
+      <tr><th>Instruments</th><td><ul>${instruments}</ul></td></tr>
+    </table>
+  </div>
 </div>
   `;
 }
@@ -343,6 +354,10 @@ function _detailFormatterJa(_index, row) {
   const url = encodeURI(`${midiDB}/${row.file}`);
   const title = encodeURIComponent(toString(row.title));
   const composer = encodeURIComponent(toString(row.composer));
+  let instruments = "";
+  row.instruments.split(", ").forEach((instrument) => {
+    instruments += `<li>${instrument}</li>`;
+  });
   return `
 <div class="d-flex p-2">
   <div>
@@ -363,7 +378,6 @@ function _detailFormatterJa(_index, row) {
       <tr><th>作曲者</th><td>${toString(row.composer)}</td></tr>
       <tr><th>作品</th><td>${toString(row.opus)}</td></tr>
       <tr><th>作詞者</th><td>${toString(row.lyricist)}</td></tr>
-      <tr><th>楽器</th><td>${toString(row.instruments)}</td></tr>
       <tr><th>日付</th><td>${toString(row.date)}</td></tr>
       <tr><th>スタイル</th><td>${toString(row.style)}</td></tr>
       <tr><th>編曲者</th><td>${toString(row.arranger)}</td></tr>
@@ -379,6 +393,14 @@ function _detailFormatterJa(_index, row) {
       <tr><th>保守者</th><td>${toString(row.maintainer)}</td></tr>
       <tr><th>Email</th><td>${toString(row.email)}</td></tr>
       <tr><th>Web</th><td>${toString(row.web)}</td></tr>
+    </table>
+  </div>
+  <div>
+    <h5>注釈情報</h5>
+    <table class="table table-sm table-striped w-auto">
+      <tr><th>難易度</th><td>${row.difficulty}</td></tr>
+      <tr><th>BPM</th><td>${row.bpm}</td></tr>
+      <tr><th>Instruments</th><td><ul>${instruments}</ul></td></tr>
     </table>
   </div>
 </div>

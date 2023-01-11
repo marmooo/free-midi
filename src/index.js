@@ -20,6 +20,10 @@ function changeLang() {
   location.href = `/free-midi/${lang}/`;
 }
 
+function unlockAudio() {
+  player.resumeContext();
+}
+
 function speedDown() {
   const input = document.getElementById("speed");
   const speed = parseInt(input.value) - 10;
@@ -488,3 +492,7 @@ document.getElementById("volumeOnOff").onclick = volumeOnOff;
 document.getElementById("volumebar").onchange = changeVolumebar;
 document.getElementById("seekbar").onchange = changeSeekbar;
 document.getElementById("instruments").onchange = changeInstruments;
+document.addEventListener("click", unlockAudio, {
+  once: true,
+  useCapture: true,
+});

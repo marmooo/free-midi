@@ -49,15 +49,10 @@ function changeSpeed() {
   if (ns) {
     switch (player.getPlayState()) {
       case "started": {
-        const tbody = $table[0].querySelector("tbody");
-        const currNode = tbody.querySelector(".bi-pause-fill");
-        const index = [...tbody.children].indexOf(currNode);
         player.stop();
         setSpeed(ns);
         const seconds = parseInt(document.getElementById("seekbar").value);
-        player.start(ns, undefined, seconds).then(() => {
-          playNext(currNode, index);
-        });
+        player.start(ns, undefined, seconds);
         break;
       }
       case "paused":
@@ -168,27 +163,30 @@ function setSeekbarInterval(seconds) {
   }, 1000);
 }
 
-async function playMIDI(event, index, midiUrl, seconds) {
-  ns = await core.urlToNoteSequence(midiUrl);
+async function loadMIDI(url) {
+  ns = await core.urlToNoteSequence(url);
   nsCache = core.sequences.clone(ns);
   ns.controlChanges.forEach((n) => n.p = n.program);
   ns.notes.map((note) => {
     note.p = note.program;
   });
-  setNoteInstruments(ns);
-  setSpeed(ns);
-  player.loadSamples(ns, undefined, seconds).then(() => {
-    const volume = document.getElementById("volumebar").value;
-    player.output.volume.value = volume;
-    player.start(ns).then(() => {
-      playNext(event.target, index);
-    });
-    initSeekbar(ns, seconds);
-  });
 }
 
-function playNext(node, index) {
-  node.className = "bi bi-play-fill";
+function playMIDI(seconds) {
+  setNoteInstruments(ns);
+  setSpeed(ns);
+  const volume = document.getElementById("volumebar").value;
+  player.output.volume.value = volume;
+  player.start(ns, undefined, seconds);
+  initSeekbar(ns, seconds);
+}
+
+function playNext() {
+  const tbody = $table[0].querySelector("tbody");
+  const pauseNode = tbody.querySelector(".bi-pause-fill");
+  const tr = pauseNode.parentNode.parentNode.parentNode;
+  const index = [...tbody.children].indexOf(tr);
+  pauseNode.className = "bi bi-play-fill";
   const pageData = $table.bootstrapTable("getData", { useCurrentPage: true });
   if ((index + 1) % pageData.length == 0) {
     const data = $table.bootstrapTable("getData");
@@ -208,7 +206,6 @@ function playNext(node, index) {
       if (nextNode) nextNode.click();
     }
   } else {
-    const tr = node.parentNode.parentNode.parentNode;
     const nextNode = tr.nextElementSibling.querySelector(".bi-play-fill");
     if (nextNode) nextNode.click();
   }
@@ -232,22 +229,15 @@ function loadInstruments() {
     });
 }
 
-function changeInstruments() {
+async function changeInstruments() {
   switch (player.getPlayState()) {
     case "started": {
-      const tbody = $table[0].querySelector("tbody");
-      const currNode = tbody.querySelector(".bi-pause-fill");
-      const index = [...tbody.children].indexOf(currNode);
       player.stop();
       setNoteInstruments(ns);
       setSpeed(ns);
       const seconds = parseInt(document.getElementById("seekbar").value);
-      player.loadSamples(ns).then(() => {
-        player.start(ns, undefined, seconds).then(() => {
-          playNext(currNode, index);
-        });
-        initSeekbar(ns, seconds);
-      });
+      player.start(ns, undefined, seconds);
+      initSeekbar(ns, seconds);
       break;
     }
     case "paused":
@@ -257,16 +247,21 @@ function changeInstruments() {
 }
 
 loadConfig();
-const midiDB = "https://midi-db.pages.dev";
+// const midiDB = "https://midi-db.pages.dev";
+const midiDB = "/midi-db";
 const $table = $("#midiList");
 const soundFont =
   "https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus";
+const playerCallback = {
+  run: () => {},
+  stop: () => { playNext() },
+};
 const player = new core.SoundFontPlayer(
   soundFont,
   undefined,
   undefined,
   undefined,
-  undefined,
+  playerCallback,
 );
 let ns;
 let nsCache;
@@ -435,18 +430,19 @@ window.toolEvents = {
         if (player.isPlaying()) player.stop();
         e.target.className = "bi bi-pause-fill";
         const url = `${midiDB}/${row.file}`;
-        playMIDI(e, index, url, 0);
+        loadMIDI(url).then(() => {
+          playMIDI(0);
+        });
         break;
       }
       case "bi bi-play": {
         e.target.className = "bi bi-pause-fill";
         if (configChanged) {
           player.stop();
-          const url = `${midiDB}/${row.file}`;
           const seconds = parseInt(document.getElementById("seekbar").value);
           const input = document.getElementById("speed");
           const speed = input.value / 100;
-          playMIDI(e, index, url, seconds / speed);
+          playMIDI(seconds / speed);
           configChanged = false;
         } else {
           player.resume();

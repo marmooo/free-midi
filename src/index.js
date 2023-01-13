@@ -247,8 +247,7 @@ async function changeInstruments() {
 }
 
 loadConfig();
-// const midiDB = "https://midi-db.pages.dev";
-const midiDB = "/midi-db";
+const midiDB = "https://midi-db.pages.dev";
 const $table = $("#midiList");
 const soundFont =
   "https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus";

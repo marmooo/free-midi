@@ -417,44 +417,64 @@ function _toolFormatterJa(_value, _row, _index) {
   `;
 }
 
+function play(node, row) {
+  if (!node) {
+    const pageData = $table.bootstrapTable("getData", { useCurrentPage: true });
+    node = document.querySelector("#midiList td:nth-child(2) i");
+    row = pageData[0];
+  }
+  const prevNodes = $table[0]
+    .querySelectorAll("tbody .bi-pause-fill, .bi-play");
+  [...prevNodes].forEach((prevNode) => {
+    prevNode.className = "bi bi-play-fill";
+  });
+  if (player.isPlaying()) player.stop();
+  node.className = "bi bi-pause-fill";
+  const url = `${midiDB}/${row.file}`;
+  loadMIDI(url).then(() => {
+    playMIDI(0);
+  });
+}
+
+function replay(node) {
+  if (!node) {
+    const selector = "#midiList td:nth-child(2) i[class='bi bi-play']";
+    node = document.querySelector(selector);
+  }
+  node.className = "bi bi-pause-fill";
+  if (configChanged) {
+    player.stop();
+    const seconds = parseInt(document.getElementById("seekbar").value);
+    const input = document.getElementById("speed");
+    const speed = input.value / 100;
+    playMIDI(seconds / speed);
+    configChanged = false;
+  } else {
+    player.resume();
+    const seconds = parseInt(document.getElementById("seekbar").value);
+    setSeekbarInterval(seconds);
+  }
+}
+
+function pause(node) {
+  if (!node) {
+    const selector = "#midiList td:nth-child(2) i[class='bi bi-pause-fill']";
+    node = document.querySelector(selector);
+  }
+  node.className = "bi bi-play";
+  player.pause();
+  clearInterval(seekbarInterval);
+}
+
 window.toolEvents = {
-  "click .bi-play-fill": function (e, _value, row, index) {
+  "click .bi-play-fill": function (e, _value, row, _index) {
     switch (e.target.className) {
-      case "bi bi-play-fill": {
-        const prevNodes = $table[0]
-          .querySelectorAll("tbody .bi-pause-fill, .bi-play");
-        [...prevNodes].forEach((prevNode) => {
-          prevNode.className = "bi bi-play-fill";
-        });
-        if (player.isPlaying()) player.stop();
-        e.target.className = "bi bi-pause-fill";
-        const url = `${midiDB}/${row.file}`;
-        loadMIDI(url).then(() => {
-          playMIDI(0);
-        });
-        break;
-      }
-      case "bi bi-play": {
-        e.target.className = "bi bi-pause-fill";
-        if (configChanged) {
-          player.stop();
-          const seconds = parseInt(document.getElementById("seekbar").value);
-          const input = document.getElementById("speed");
-          const speed = input.value / 100;
-          playMIDI(seconds / speed);
-          configChanged = false;
-        } else {
-          player.resume();
-          const seconds = parseInt(document.getElementById("seekbar").value);
-          setSeekbarInterval(seconds);
-        }
-        break;
-      }
+      case "bi bi-play-fill":
+        return play(e.target, row);
+      case "bi bi-play":
+        return replay(e.target);
       case "bi bi-pause-fill":
-        e.target.className = "bi bi-play";
-        player.pause();
-        clearInterval(seekbarInterval);
-        break;
+        return pause(e.target);
     }
   },
 };
@@ -477,6 +497,22 @@ fetch(`${midiDB}/${document.documentElement.lang}.json`)
     $("#midiList").bootstrapTable("load", data);
   });
 
+function typeEvent(event) {
+  switch (event.code) {
+    case "Space":
+      event.preventDefault();
+      switch (player.getPlayState()) {
+        case "paused":
+          return replay();
+        case "started":
+          return pause();
+        case "stopped":
+          return play();
+      }
+      break;
+  }
+}
+
 document.getElementById("toggleDarkMode").onclick = toggleDarkMode;
 document.getElementById("lang").onchange = changeLang;
 document.getElementById("speed").onchange = changeSpeed;
@@ -487,6 +523,7 @@ document.getElementById("volumeOnOff").onclick = volumeOnOff;
 document.getElementById("volumebar").onchange = changeVolumebar;
 document.getElementById("seekbar").onchange = changeSeekbar;
 document.getElementById("instruments").onchange = changeInstruments;
+document.addEventListener("keydown", typeEvent);
 document.addEventListener("click", unlockAudio, {
   once: true,
   useCapture: true,

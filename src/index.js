@@ -291,6 +291,24 @@ function _filterRange(text, value, _field, _data) {
   }
 }
 
+function _filterTime(text, value, _field, _data) {
+  const [mm, ss] = value.split(":");
+  const sec = parseInt(mm) * 60 + parseInt(ss);
+  switch (text[0]) {
+    case ">":
+      if (text.length == 1) return true;
+      if (sec > parseInt(text.slice(1))) return true;
+      return false;
+    case "<":
+      if (text.length == 1) return true;
+      if (sec < parseInt(text.slice(1))) return true;
+      return false;
+    default:
+      if (value == text) return true;
+      return false;
+  }
+}
+
 function toLink(url, text) {
   if (!url) return text;
   return `<a href="${url}">${text}</a>`
@@ -356,6 +374,7 @@ function _detailFormatterEn(_index, row) {
   <div>
     <h5>Annotation Info</h5>
     <table class="table table-sm table-striped w-auto">
+      <tr><th>Time</th><td>${formatTime(row.time)}</td></tr>
       <tr><th>Difficulty</th><td>${row.difficulty}</td></tr>
       <tr><th>BPM</th><td>${row.bpm}</td></tr>
       <tr><th>Instruments</th><td><ul>${instruments}</ul></td></tr>
@@ -416,6 +435,7 @@ function _detailFormatterJa(_index, row) {
   <div>
     <h5>注釈情報</h5>
     <table class="table table-sm table-striped w-auto">
+      <tr><th>時間</th><td>${formatTime(row.time)}</td></tr>
       <tr><th>難易度</th><td>${row.difficulty}</td></tr>
       <tr><th>BPM</th><td>${row.bpm}</td></tr>
       <tr><th>Instruments</th><td><ul>${instruments}</ul></td></tr>

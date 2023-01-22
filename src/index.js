@@ -347,7 +347,7 @@ function _detailFormatterEn(_index, row) {
     instruments += `<li>${instrument}</li>`;
   });
   return `
-<div class="d-flex p-2">
+<div class="d-flex overflow-scroll p-2">
   <div>
     <h5>Score</h5>
     <table class="table table-sm table-striped w-auto">
@@ -410,7 +410,7 @@ function _detailFormatterJa(_index, row) {
     instruments += `<li>${instrument}</li>`;
   });
   return `
-<div class="d-flex p-2">
+<div class="d-flex overflow-scroll p-2">
   <div>
     <h5>楽譜</h5>
     <table class="table table-sm table-striped w-auto">

@@ -374,7 +374,7 @@ function _detailFormatterEn(_index, row) {
   <div>
     <h5>Annotation Info</h5>
     <table class="table table-sm table-striped w-auto">
-      <tr><th>Time</th><td>${formatTime(row.time)}</td></tr>
+      <tr><th>Time</th><td>${row.time}</td></tr>
       <tr><th>Difficulty</th><td>${row.difficulty}</td></tr>
       <tr><th>BPM</th><td>${row.bpm}</td></tr>
       <tr><th>Instruments</th><td><ul>${instruments}</ul></td></tr>
@@ -435,7 +435,7 @@ function _detailFormatterJa(_index, row) {
   <div>
     <h5>注釈情報</h5>
     <table class="table table-sm table-striped w-auto">
-      <tr><th>時間</th><td>${formatTime(row.time)}</td></tr>
+      <tr><th>時間</th><td>${row.time}</td></tr>
       <tr><th>難易度</th><td>${row.difficulty}</td></tr>
       <tr><th>BPM</th><td>${row.bpm}</td></tr>
       <tr><th>Instruments</th><td><ul>${instruments}</ul></td></tr>

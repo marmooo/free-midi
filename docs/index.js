@@ -39,7 +39,7 @@ function loadConfig(){localStorage.getItem("darkMode")==1&&(document.documentEle
   <div>
     <h5>Annotation Info</h5>
     <table class="table table-sm table-striped w-auto">
-      <tr><th>Time</th><td>${formatTime(a.time)}</td></tr>
+      <tr><th>Time</th><td>${a.time}</td></tr>
       <tr><th>Difficulty</th><td>${a.difficulty}</td></tr>
       <tr><th>BPM</th><td>${a.bpm}</td></tr>
       <tr><th>Instruments</th><td><ul>${e}</ul></td></tr>
@@ -87,7 +87,7 @@ function loadConfig(){localStorage.getItem("darkMode")==1&&(document.documentEle
   <div>
     <h5>注釈情報</h5>
     <table class="table table-sm table-striped w-auto">
-      <tr><th>時間</th><td>${formatTime(a.time)}</td></tr>
+      <tr><th>時間</th><td>${a.time}</td></tr>
       <tr><th>難易度</th><td>${a.difficulty}</td></tr>
       <tr><th>BPM</th><td>${a.bpm}</td></tr>
       <tr><th>Instruments</th><td><ul>${e}</ul></td></tr>

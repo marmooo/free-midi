@@ -8,7 +8,7 @@ function loadConfig(){localStorage.getItem("darkMode")==1&&(document.documentEle
     </table>
     <h5 class="pt-3">Game</h5>
     <table class="table table-sm table-striped w-auto">
-      <tr><th>Classic</th><td><a href="https://marmooo.github.io/tip-tap-nots/?url=${b}&title=${c}&composer=${d}">Tip Tap Notes</a></td></tr>
+      <tr><th>Classic</th><td><a href="https://marmooo.github.io/tip-tap-notes/?url=${b}&title=${c}&composer=${d}">Tip Tap Notes</a></td></tr>
       <tr><th>TODO</th><td>Coming soon.</td></tr>
     </table>
   </div>
@@ -55,7 +55,7 @@ function loadConfig(){localStorage.getItem("darkMode")==1&&(document.documentEle
     </table>
     <h5 class="pt-3">ゲーム</h5>
     <table class="table table-sm table-striped w-auto">
-      <tr><th>Classic</th><td><a href="https://marmooo.github.io/tip-tap-nots/?url=${b}&title=${c}&composer=${d}">Tip Tap Notes</a></td></tr>
+      <tr><th>Classic</th><td><a href="https://marmooo.github.io/tip-tap-notes/?url=${b}&title=${c}&composer=${d}">Tip Tap Notes</a></td></tr>
       <tr><th>TODO</th><td>Coming soon.</td></tr>
     </table>
   </div>

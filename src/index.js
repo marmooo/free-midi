@@ -323,12 +323,25 @@ function toLicense(text) {
   }
 }
 
+function toDownload(id, url, lang) {
+  if (id.startsWith("!")) {
+    switch (lang) {
+      case "ja": return "HP からダウンロードしてください。";
+      case "en": return "Please download from the homepage.";
+    }
+  } else {
+    return toLink(url, "MIDI");
+  }
+}
+
 function _detailFormatterEn(_index, row) {
-  const url = encodeURI(`${midiDB}/${row.file}`);
+  const midiURL = `${midiDB}/${row.file}`;
+  const url = encodeURI(midiURL);
   const title = encodeURIComponent(toString(row.title));
   const composer = encodeURIComponent(toString(row.composer));
   const license = toLicense(row.license);
   const web = toLink(row.web, row.web);
+  const download = toDownload(row.id, midiURL, "en");
   let instruments = "";
   row.instruments.split(", ").forEach((instrument) => {
     instruments += `<li>${instrument}</li>`;
@@ -364,7 +377,7 @@ function _detailFormatterEn(_index, row) {
     <h5>File Info</h5>
     <table class="table table-sm table-striped w-auto">
       <tr><th>License</th><td>${toString(license)}</td></tr>
-      <tr><th>Download</th><td><a href="${toString(url)}">MIDI</a></td></tr>
+      <tr><th>Download</th><td>${download}</td></tr>
       <tr><th>ID</th><td>${toString(row.id)}</td></tr>
       <tr><th>Maintainer</th><td>${toString(row.maintainer)}</td></tr>
       <tr><th>Email</th><td>${toString(row.email)}</td></tr>
@@ -385,11 +398,13 @@ function _detailFormatterEn(_index, row) {
 }
 
 function _detailFormatterJa(_index, row) {
-  const url = encodeURI(`${midiDB}/${row.file}`);
+  const midiURL = `${midiDB}/${row.file}`;
+  const url = encodeURI(midiURL);
   const title = encodeURIComponent(toString(row.title));
   const composer = encodeURIComponent(toString(row.composer));
   const license = toLicense(row.license);
   const web = toLink(row.web, row.web);
+  const download = toDownload(row.id, midiURL, "ja");
   let instruments = "";
   row.instruments.split(", ").forEach((instrument) => {
     instruments += `<li>${instrument}</li>`;
@@ -425,7 +440,7 @@ function _detailFormatterJa(_index, row) {
     <h5>ファイル情報</h5>
     <table class="table table-sm table-striped w-auto">
       <tr><th>ライセンス</th><td>${toString(license)}</td></tr>
-      <tr><th>ダウンロード</th><td><a href="${toString(url)}">MIDI</a></td></tr>
+      <tr><th>ダウンロード</th><td>${download}</td></tr>
       <tr><th>id</th><td>${toString(row.id)}</td></tr>
       <tr><th>保守者</th><td>${toString(row.maintainer)}</td></tr>
       <tr><th>Email</th><td>${toString(row.email)}</td></tr>

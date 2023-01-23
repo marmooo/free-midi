@@ -606,7 +606,8 @@ fetch(`${midiDB}/${document.documentElement.lang}.json`)
         info.instruments = getInstrumentsString(list, info);
       });
     });
-    $("#midiList").bootstrapTable("load", data);
+    $table.bootstrapTable("load", data);
+    $table.on("reset-view.bs.table", addFilterControl);
     addFilterControl();
   });
 

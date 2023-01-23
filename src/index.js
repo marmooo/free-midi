@@ -246,6 +246,97 @@ async function changeInstruments() {
   }
 }
 
+// replace FilterControl to support IME
+function addFilterControl() {
+  const ths = document.querySelectorAll("#midiList > thead > tr > th");
+  [...ths].slice(2).forEach((th) => {
+    const name = th.textContent.toLowerCase();
+    const fht = th.querySelector("div.fht-cell");
+    const input = document.createElement("input");
+    input.type = "search";
+    input.className = "form-control";
+    switch (name) {
+      case "born":
+        input.placeHolder = ">1850";
+        input.onchange = () => { filterColumn(name, input.value, filterByRange) };
+        break;
+      case "died":
+        input.placeHolder = "<1920";
+        input.onchange = () => { filterColumn(name, input.value, filterByRange) };
+        break;
+      case "difficulty":
+        input.placeHolder = "<50";
+        input.onchange = () => { filterColumn(name, input.value, filterByRange) };
+        break;
+      case "bpm":
+        input.placeHolder = "<120";
+        input.onchange = () => { filterColumn(name, input.value, filterByRange) };
+        break;
+      case "time":
+        input.placeHolder = ">30(sec)";
+        input.onchange = () => { filterColumn(name, input.value, filterByTime) };
+        break;
+      default:
+        input.onchange = () => { filterColumn(name, input.value, filterByPartialMatch) };
+        break;
+    }
+    fht.replaceChildren(input);
+  });
+}
+
+function filterColumn(name, text, callback) {
+  if (text == "") {
+    $table.bootstrapTable("filterBy", {}, {
+      "filterAlgorithm": true
+    });
+  } else {
+    $table.bootstrapTable("filterBy", {}, {
+      "filterAlgorithm": (row) => {
+        return callback(text, row[name]);
+      }
+    });
+  }
+}
+
+function filterByPartialMatch(text, value) {
+  if (!value) return false;
+  return value.toLowerCase().includes(text.toLowerCase());
+}
+
+function filterByRange(text, value) {
+  switch (text[0]) {
+    case ">":
+      if (text.length == 1) return true;
+      if (parseInt(value) > parseInt(text.slice(1))) return true;
+      return false;
+    case "<":
+      if (text.length == 1) return true;
+      if (parseInt(value) < parseInt(text.slice(1))) return true;
+      return false;
+    default:
+      if (value == text) return true;
+      return false;
+  }
+}
+
+function filterByTime(text, value) {
+  const [mm, ss] = value.split(":");
+  const sec = parseInt(mm) * 60 + parseInt(ss);
+  switch (text[0]) {
+    case ">":
+      if (text.length == 1) return true;
+      if (sec > parseInt(text.slice(1))) return true;
+      return false;
+    case "<":
+      if (text.length == 1) return true;
+      if (sec < parseInt(text.slice(1))) return true;
+      return false;
+    default:
+      if (value == text) return true;
+      return false;
+  }
+}
+
 loadConfig();
 const midiDB = "https://midi-db.pages.dev";
 const $table = $("#midiList");
@@ -272,40 +363,6 @@ function toString(data) {
     return data;
   } else {
     return "";
-  }
-}
-
-function _filterRange(text, value, _field, _data) {
-  switch (text[0]) {
-    case ">":
-      if (text.length == 1) return true;
-      if (parseInt(value) > parseInt(text.slice(1))) return true;
-      return false;
-    case "<":
-      if (text.length == 1) return true;
-      if (parseInt(value) < parseInt(text.slice(1))) return true;
-      return false;
-    default:
-      if (value == text) return true;
-      return false;
-  }
-}
-
-function _filterTime(text, value, _field, _data) {
-  const [mm, ss] = value.split(":");
-  const sec = parseInt(mm) * 60 + parseInt(ss);
-  switch (text[0]) {
-    case ">":
-      if (text.length == 1) return true;
-      if (sec > parseInt(text.slice(1))) return true;
-      return false;
-    case "<":
-      if (text.length == 1) return true;
-      if (sec < parseInt(text.slice(1))) return true;
-      return false;
-    default:
-      if (value == text) return true;
-      return false;
   }
 }
 
@@ -550,6 +607,7 @@ fetch(`${midiDB}/${document.documentElement.lang}.json`)
       });
     });
     $("#midiList").bootstrapTable("load", data);
+    addFilterControl();
   });
 
 function typeEvent(event) {

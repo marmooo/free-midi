@@ -250,7 +250,7 @@ async function changeInstruments() {
 function addFilterControl() {
   const ths = document.querySelectorAll("#midiList > thead > tr > th");
   [...ths].slice(2).forEach((th) => {
-    const name = th.textContent.toLowerCase();
+    const name = th.dataset.field;
     const fht = th.querySelector("div.fht-cell");
     const input = document.createElement("input");
     input.type = "search";

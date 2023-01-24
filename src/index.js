@@ -259,26 +259,38 @@ function addFilterControl() {
     switch (name) {
       case "born":
         input.placeHolder = ">1850";
-        input.onchange = () => { filterColumn(name, input.value, filterByRange) };
+        input.onchange = () => {
+          filterColumn(name, input.value, filterByRange);
+        };
         break;
       case "died":
         input.placeHolder = "<1920";
-        input.onchange = () => { filterColumn(name, input.value, filterByRange) };
+        input.onchange = () => {
+          filterColumn(name, input.value, filterByRange);
+        };
         break;
       case "difficulty":
         input.placeHolder = "<50";
-        input.onchange = () => { filterColumn(name, input.value, filterByRange) };
+        input.onchange = () => {
+          filterColumn(name, input.value, filterByRange);
+        };
         break;
       case "bpm":
         input.placeHolder = "<120";
-        input.onchange = () => { filterColumn(name, input.value, filterByRange) };
+        input.onchange = () => {
+          filterColumn(name, input.value, filterByRange);
+        };
         break;
       case "time":
         input.placeHolder = ">30(sec)";
-        input.onchange = () => { filterColumn(name, input.value, filterByTime) };
+        input.onchange = () => {
+          filterColumn(name, input.value, filterByTime);
+        };
         break;
       default:
-        input.onchange = () => { filterColumn(name, input.value, filterByPartialMatch) };
+        input.onchange = () => {
+          filterColumn(name, input.value, filterByPartialMatch);
+        };
         break;
     }
     fht.replaceChildren(input);
@@ -289,13 +301,13 @@ function filterColumn(name, text, callback) {
   filterStates.set(name, text);
   if (text == "") {
     $table.bootstrapTable("filterBy", {}, {
-      "filterAlgorithm": true
+      "filterAlgorithm": true,
     });
   } else {
     $table.bootstrapTable("filterBy", {}, {
       "filterAlgorithm": (row) => {
         return callback(text, row[name]);
-      }
+      },
     });
   }
 }
@@ -349,7 +361,7 @@ function toString(data) {
 
 function toLink(url, text) {
   if (!url) return text;
-  return `<a href="${url}">${text}</a>`
+  return `<a href="${url}">${text}</a>`;
 }
 
 function toLicense(text) {
@@ -364,8 +376,10 @@ function toLicense(text) {
 function toDownload(id, url, lang) {
   if (id.startsWith("!")) {
     switch (lang) {
-      case "ja": return "HP からダウンロードしてください。";
-      case "en": return "Please download from the homepage.";
+      case "ja":
+        return "HP からダウンロードしてください。";
+      case "en":
+        return "Please download from the homepage.";
     }
   } else {
     return toLink(url, "MIDI");
@@ -612,7 +626,9 @@ const soundFont =
   "https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus";
 const playerCallback = {
   run: () => {},
-  stop: () => { playNext() },
+  stop: () => {
+    playNext();
+  },
 };
 const player = new core.SoundFontPlayer(
   soundFont,
@@ -646,7 +662,7 @@ fetch(`${midiDB}/${document.documentElement.lang}.json`)
     const searchClearButton = toolbar.children[1].querySelector("button");
     searchClearButton.addEventListener("click", () => {
       $table.bootstrapTable("filterBy", {}, {
-        "filterAlgorithm": true
+        "filterAlgorithm": true,
       });
     });
     addFilterControl();

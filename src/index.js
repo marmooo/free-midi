@@ -337,27 +337,6 @@ function filterByTime(text, value) {
   }
 }
 
-loadConfig();
-const midiDB = "https://midi-db.pages.dev";
-const $table = $("#midiList");
-const soundFont =
-  "https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus";
-const playerCallback = {
-  run: () => {},
-  stop: () => { playNext() },
-};
-const player = new core.SoundFontPlayer(
-  soundFont,
-  undefined,
-  undefined,
-  undefined,
-  playerCallback,
-);
-let ns;
-let nsCache;
-let configChanged = false;
-let seekbarInterval;
-
 function toString(data) {
   if (data) {
     return data;
@@ -597,20 +576,6 @@ function getInstrumentsString(list, info) {
   return ids.map((id) => list[id]).join(", ");
 }
 
-const insturmentsPromise = loadInstruments();
-fetch(`${midiDB}/${document.documentElement.lang}.json`)
-  .then((response) => response.json())
-  .then((data) => {
-    insturmentsPromise.then((list) => {
-      data.forEach((info) => {
-        info.instruments = getInstrumentsString(list, info);
-      });
-    });
-    $table.bootstrapTable("load", data);
-    $table.on("reset-view.bs.table", addFilterControl);
-    addFilterControl();
-  });
-
 function typeEvent(event) {
   switch (event.code) {
     case "Space":
@@ -626,6 +591,41 @@ function typeEvent(event) {
       break;
   }
 }
+
+loadConfig();
+const midiDB = "https://midi-db.pages.dev";
+const $table = $("#midiList");
+const soundFont =
+  "https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus";
+const playerCallback = {
+  run: () => {},
+  stop: () => { playNext() },
+};
+const player = new core.SoundFontPlayer(
+  soundFont,
+  undefined,
+  undefined,
+  undefined,
+  playerCallback,
+);
+let ns;
+let nsCache;
+let configChanged = false;
+let seekbarInterval;
+
+const insturmentsPromise = loadInstruments();
+fetch(`${midiDB}/${document.documentElement.lang}.json`)
+  .then((response) => response.json())
+  .then((data) => {
+    insturmentsPromise.then((list) => {
+      data.forEach((info) => {
+        info.instruments = getInstrumentsString(list, info);
+      });
+    });
+    $table.bootstrapTable("load", data);
+    $table.on("reset-view.bs.table", addFilterControl);
+    addFilterControl();
+  });
 
 document.getElementById("toggleDarkMode").onclick = toggleDarkMode;
 document.getElementById("lang").onchange = changeLang;

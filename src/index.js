@@ -613,7 +613,6 @@ function initFilterStates() {
   const ths = document.querySelectorAll("#midiList > thead > tr > th");
   [...ths].slice(1).forEach((th) => {
     const name = th.dataset.field;
-    console.log(name);
     states.set(name, "");
   });
   return states;

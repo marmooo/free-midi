@@ -638,8 +638,16 @@ fetch(`${midiDB}/${document.documentElement.lang}.json`)
     });
     $table.bootstrapTable("load", data);
     // TODO: column-switch.bs.table does not work
-    [...document.querySelectorAll(".buttons-toolbar input")].forEach((input) => {
+    const toolbar = document.querySelector(".buttons-toolbar");
+    [...toolbar.querySelectorAll("input")].forEach((input) => {
       input.addEventListener("change", addFilterControl);
+    });
+    // TODO: data-show-search-clear-button doew not work
+    const searchClearButton = toolbar.children[1].querySelector("button");
+    searchClearButton.addEventListener("click", () => {
+      $table.bootstrapTable("filterBy", {}, {
+        "filterAlgorithm": true
+      });
     });
     addFilterControl();
   });

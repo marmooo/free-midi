@@ -229,7 +229,7 @@ function loadInstruments() {
     });
 }
 
-async function changeInstruments() {
+function changeInstruments() {
   switch (player.getPlayState()) {
     case "started": {
       player.stop();

@@ -253,6 +253,7 @@ function addFilterControl() {
     const name = th.dataset.field;
     const fht = th.querySelector("div.fht-cell");
     const input = document.createElement("input");
+    input.value = filterStates.get(name);
     input.type = "search";
     input.className = "form-control";
     switch (name) {
@@ -285,6 +286,7 @@ function addFilterControl() {
 }
 
 function filterColumn(name, text, callback) {
+  filterStates.set(name, text);
   if (text == "") {
     $table.bootstrapTable("filterBy", {}, {
       "filterAlgorithm": true
@@ -592,6 +594,17 @@ function typeEvent(event) {
   }
 }
 
+function initFilterStates() {
+  const states = new Map();
+  const ths = document.querySelectorAll("#midiList > thead > tr > th");
+  [...ths].slice(1).forEach((th) => {
+    const name = th.dataset.field;
+    console.log(name);
+    states.set(name, "");
+  });
+  return states;
+}
+
 loadConfig();
 const midiDB = "https://midi-db.pages.dev";
 const $table = $("#midiList");
@@ -608,6 +621,7 @@ const player = new core.SoundFontPlayer(
   undefined,
   playerCallback,
 );
+const filterStates = initFilterStates();
 let ns;
 let nsCache;
 let configChanged = false;
@@ -623,7 +637,10 @@ fetch(`${midiDB}/${document.documentElement.lang}.json`)
       });
     });
     $table.bootstrapTable("load", data);
-    $table.on("reset-view.bs.table", addFilterControl);
+    // TODO: column-switch.bs.table does not work
+    [...document.querySelectorAll(".buttons-toolbar input")].forEach((input) => {
+      input.addEventListener("change", addFilterControl);
+    });
     addFilterControl();
   });
 

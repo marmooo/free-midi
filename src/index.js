@@ -26,40 +26,52 @@ function unlockAudio() {
 
 function speedDown() {
   const input = document.getElementById("speed");
-  const speed = parseInt(input.value) - 10;
-  if (speed < 0) {
-    input.value = 0;
-  } else {
-    input.value = speed;
-  }
+  const value = parseInt(input.value) - 10;
+  const speed = (value < 0) ? 0 : value;
+  input.value = speed;
   document.getElementById("speedDown").disabled = true;
-  changeSpeed();
+  changeSpeed(speed);
   document.getElementById("speedDown").disabled = false;
 }
 
 function speedUp() {
   const input = document.getElementById("speed");
-  input.value = parseInt(input.value) + 10;
+  const speed = parseInt(input.value) + 10;
+  input.value = speed;
   document.getElementById("speedUp").disabled = true;
-  changeSpeed();
+  changeSpeed(speed);
   document.getElementById("speedUp").disabled = false;
 }
 
-function changeSpeed() {
-  if (ns) {
-    switch (player.getPlayState()) {
-      case "started": {
-        player.stop();
-        setSpeed(ns);
-        const seconds = parseInt(document.getElementById("seekbar").value);
-        player.start(ns, undefined, seconds);
-        break;
-      }
-      case "paused":
-        configChanged = true;
-        break;
+function changeSpeed(speed) {
+  if (!ns) return;
+  switch (player.getPlayState()) {
+    case "started": {
+      player.stop();
+      clearInterval(timer);
+      const prevRate = nsCache.totalTime / ns.totalTime;
+      const rate = prevRate / (speed / 100);
+      const newSeconds = currentTime * rate;
+      setSpeed(ns);
+      initSeekbar(ns, newSeconds);
+      player.start(ns, undefined, newSeconds);
+      setTimer(newSeconds);
+      break;
+    }
+    case "paused": {
+      setSpeed(ns);
+      const prevRate = nsCache.totalTime / ns.totalTime;
+      const rate = prevRate / (speed / 100);
+      const newSeconds = currentTime * rate;
+      initSeekbar(ns, newSeconds);
+      break;
     }
   }
+}
+
+function changeSpeedEvent(event) {
+  const speed = parseInt(event.target.value);
+  changeSpeed(speed);
 }
 
 function setSpeed(ns) {
@@ -131,12 +143,11 @@ function formatTime(seconds) {
 }
 
 function changeSeekbar(event) {
-  clearInterval(seekbarInterval);
+  clearInterval(timer);
   const seconds = parseInt(event.target.value);
   document.getElementById("currentTime").textContent = formatTime(seconds);
   if (player.isPlaying()) {
     player.seekTo(seconds);
-    setSeekbarInterval(seconds);
     if (player.getPlayState() == "paused") player.resume();
   }
 }
@@ -152,15 +163,24 @@ function initSeekbar(ns, seconds) {
   document.getElementById("seekbar").max = ns.totalTime;
   document.getElementById("seekbar").value = seconds;
   document.getElementById("totalTime").textContent = formatTime(ns.totalTime);
-  clearInterval(seekbarInterval);
-  setSeekbarInterval(seconds);
+  document.getElementById("currentTime").textContent = formatTime(seconds);
 }
 
-function setSeekbarInterval(seconds) {
-  seekbarInterval = setInterval(() => {
-    updateSeekbar(seconds);
-    seconds += 1;
-  }, 1000);
+function setTimer(seconds) {
+  const delay = 10;
+  const startTime = Date.now() - seconds * 1000;
+  const totalTime = ns.totalTime;
+  timer = setInterval(() => {
+    const nextTime = (Date.now() - startTime) / 1000;
+    if (Math.floor(currentTime) != Math.floor(nextTime)) {
+      updateSeekbar(nextTime);
+    }
+    currentTime = nextTime;
+    if (currentTime >= totalTime) {
+      clearInterval(timer);
+      currentTime = 0;
+    }
+  }, delay);
 }
 
 async function loadMIDI(url) {
@@ -559,7 +579,7 @@ function replay(node) {
   } else {
     player.resume();
     const seconds = parseInt(document.getElementById("seekbar").value);
-    setSeekbarInterval(seconds);
+    setTimer(seconds);
   }
 }
 
@@ -570,7 +590,7 @@ function pause(node) {
   }
   node.className = "bi bi-play";
   player.pause();
-  clearInterval(seekbarInterval);
+  clearInterval(timer);
 }
 
 window.toolEvents = {
@@ -637,10 +657,11 @@ const player = new core.SoundFontPlayer(
   playerCallback,
 );
 const filterStates = initFilterStates();
+let currentTime = 0;
 let ns;
 let nsCache;
 let configChanged = false;
-let seekbarInterval;
+let timer;
 
 const insturmentsPromise = loadInstruments();
 fetch(`${midiDB}/${document.documentElement.lang}.json`)
@@ -669,7 +690,7 @@ fetch(`${midiDB}/${document.documentElement.lang}.json`)
 
 document.getElementById("toggleDarkMode").onclick = toggleDarkMode;
 document.getElementById("lang").onchange = changeLang;
-document.getElementById("speed").onchange = changeSpeed;
+document.getElementById("speed").onchange = changeSpeedEvent;
 document.getElementById("speedDown").onclick = speedDown;
 document.getElementById("speedUp").onclick = speedUp;
 document.getElementById("repeat").onclick = repeat;

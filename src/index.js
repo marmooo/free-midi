@@ -169,7 +169,7 @@ function initSeekbar(ns, seconds) {
 }
 
 function setTimer(seconds) {
-  const delay = 10;
+  const delay = 100;
   const startTime = Date.now() - seconds * 1000;
   const totalTime = ns.totalTime;
   timer = setInterval(() => {

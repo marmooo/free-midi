@@ -52,14 +52,14 @@ function changeSpeed(speed) {
       const prevRate = nsCache.totalTime / ns.totalTime;
       const rate = prevRate / (speed / 100);
       const newSeconds = currentTime * rate;
-      setSpeed(ns);
+      setSpeed(ns, speed);
       initSeekbar(ns, newSeconds);
       player.start(ns, undefined, newSeconds);
       setTimer(newSeconds);
       break;
     }
     case "paused": {
-      setSpeed(ns);
+      setSpeed(ns, speed);
       const prevRate = nsCache.totalTime / ns.totalTime;
       const rate = prevRate / (speed / 100);
       const newSeconds = currentTime * rate;
@@ -74,9 +74,8 @@ function changeSpeedEvent(event) {
   changeSpeed(speed);
 }
 
-function setSpeed(ns) {
-  const input = document.getElementById("speed");
-  const speed = parseInt(input.value) / 100;
+function setSpeed(ns, speed) {
+  speed /= 100;
   const controlChanges = nsCache.controlChanges;
   ns.controlChanges.forEach((n, i) => {
     n.time = controlChanges[i].time / speed;
@@ -146,9 +145,12 @@ function changeSeekbar(event) {
   clearInterval(timer);
   const seconds = parseInt(event.target.value);
   document.getElementById("currentTime").textContent = formatTime(seconds);
+  currentTime = seconds;
   if (player.isPlaying()) {
     player.seekTo(seconds);
-    if (player.getPlayState() == "paused") player.resume();
+    if (player.getPlayState() == "started") {
+      setTimer(seconds);
+    }
   }
 }
 
@@ -193,11 +195,14 @@ async function loadMIDI(url) {
 }
 
 function playMIDI(seconds) {
+  clearInterval(timer);
   setNoteInstruments(ns);
-  setSpeed(ns);
+  const speed = parseInt(document.getElementById("speed").value);
+  setSpeed(ns, speed);
   const volume = document.getElementById("volumebar").value;
   player.output.volume.value = volume;
   player.start(ns, undefined, seconds);
+  setTimer(seconds);
   initSeekbar(ns, seconds);
 }
 
@@ -254,7 +259,8 @@ function changeInstruments() {
     case "started": {
       player.stop();
       setNoteInstruments(ns);
-      setSpeed(ns);
+      const speed = parseInt(document.getElementById("speed").value);
+      setSpeed(ns, speed);
       const seconds = parseInt(document.getElementById("seekbar").value);
       player.start(ns, undefined, seconds);
       initSeekbar(ns, seconds);

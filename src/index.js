@@ -414,9 +414,12 @@ function toDownload(id, url, lang) {
 
 function _detailFormatterEn(_index, row) {
   const midiURL = `${midiDB}/${row.file}`;
-  const url = encodeURI(midiURL);
-  const title = encodeURIComponent(toString(row.title));
-  const composer = encodeURIComponent(toString(row.composer));
+  const params = new URLSearchParams();
+  params.set("url", midiURL);
+  if (row.title) params.set("title", row.title);
+  if (row.composer) params.set("composer", row.composer);
+  if (row.web) params.set("web", row.web);
+  const query = params.toString();
   const license = toLicense(row.license);
   const web = toLink(row.web, row.web);
   const download = toDownload(row.id, midiURL, "en");
@@ -429,12 +432,12 @@ function _detailFormatterEn(_index, row) {
   <div>
     <h5>Score</h5>
     <table class="table table-sm table-striped w-auto">
-      <tr><th>Basic</th><td><a href="https://marmooo.github.io/midi2abc/?url=${url}&title=${title}&composer=${composer}">midi2abc</a></td></tr>
-      <tr><th>Waterfall</th><td><a href="https://marmooo.github.io/waterfall-piano/?url=${url}&title=${title}&composer=${composer}">Waterfall Piano</a></td></tr>
+      <tr><th>Basic</th><td><a href="https://marmooo.github.io/midi2abc/?${query}">midi2abc</a></td></tr>
+      <tr><th>Waterfall</th><td><a href="https://marmooo.github.io/waterfall-piano/?${query}">Waterfall Piano</a></td></tr>
     </table>
     <h5 class="pt-3">Game</h5>
     <table class="table table-sm table-striped w-auto">
-      <tr><th>Classic</th><td><a href="https://marmooo.github.io/tip-tap-notes/?url=${url}&title=${title}&composer=${composer}">Tip Tap Notes</a></td></tr>
+      <tr><th>Classic</th><td><a href="https://marmooo.github.io/tip-tap-notes/?${query}">Tip Tap Notes</a></td></tr>
       <tr><th>TODO</th><td>Coming soon.</td></tr>
     </table>
   </div>
@@ -477,9 +480,12 @@ function _detailFormatterEn(_index, row) {
 
 function _detailFormatterJa(_index, row) {
   const midiURL = `${midiDB}/${row.file}`;
-  const url = encodeURI(midiURL);
-  const title = encodeURIComponent(toString(row.title));
-  const composer = encodeURIComponent(toString(row.composer));
+  const params = new URLSearchParams();
+  params.set("url", midiURL);
+  if (row.title) params.set("title", row.title);
+  if (row.composer) params.set("composer", row.composer);
+  if (row.web) params.set("web", row.web);
+  const query = params.toString();
   const license = toLicense(row.license);
   const web = toLink(row.web, row.web);
   const download = toDownload(row.id, midiURL, "ja");
@@ -492,12 +498,12 @@ function _detailFormatterJa(_index, row) {
   <div>
     <h5>楽譜</h5>
     <table class="table table-sm table-striped w-auto">
-      <tr><th>Basic</th><td><a href="https://marmooo.github.io/midi2abc/?url=${url}&title=${title}&composer=${composer}">midi2abc</a></td></tr>
-      <tr><th>Waterfall</th><td><a href="https://marmooo.github.io/waterfall-piano/?url=${url}&title=${title}&composer=${composer}">Waterfall Piano</a></td></tr>
+      <tr><th>Basic</th><td><a href="https://marmooo.github.io/midi2abc/?${query}">midi2abc</a></td></tr>
+      <tr><th>Waterfall</th><td><a href="https://marmooo.github.io/waterfall-piano/?${query}">Waterfall Piano</a></td></tr>
     </table>
     <h5 class="pt-3">ゲーム</h5>
     <table class="table table-sm table-striped w-auto">
-      <tr><th>Classic</th><td><a href="https://marmooo.github.io/tip-tap-notes/?url=${url}&title=${title}&composer=${composer}">Tip Tap Notes</a></td></tr>
+      <tr><th>Classic</th><td><a href="https://marmooo.github.io/tip-tap-notes/?${query}">Tip Tap Notes</a></td></tr>
       <tr><th>TODO</th><td>Coming soon.</td></tr>
     </table>
   </div>

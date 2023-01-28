@@ -327,7 +327,7 @@ function filterColumn(name, text, callback) {
   filterStates.set(name, text);
   if (text == "") {
     $table.bootstrapTable("filterBy", {}, {
-      "filterAlgorithm": true,
+      "filterAlgorithm": () => true,
     });
     $table.bootstrapTable("resetView");
   } else {

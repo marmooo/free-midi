@@ -419,6 +419,7 @@ function toURLSearchParams(row) {
   params.set("url", midiURL);
   if (row.title) params.set("title", row.title);
   if (row.composer) params.set("composer", row.composer);
+  if (row.maintainer) params.set("maintainer", row.maintainer);
   if (row.web) params.set("web", row.web);
   try {
     new URL(row.license);

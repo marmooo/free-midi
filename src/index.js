@@ -329,6 +329,7 @@ function filterColumn(name, text, callback) {
     $table.bootstrapTable("filterBy", {}, {
       "filterAlgorithm": true,
     });
+    $table.bootstrapTable("resetView");
   } else {
     $table.bootstrapTable("filterBy", {}, {
       "filterAlgorithm": (row) => {
@@ -412,13 +413,24 @@ function toDownload(id, url, lang) {
   }
 }
 
-function _detailFormatterEn(_index, row) {
+function toURLSearchParams(row) {
   const midiURL = `${midiDB}/${row.file}`;
   const params = new URLSearchParams();
   params.set("url", midiURL);
   if (row.title) params.set("title", row.title);
   if (row.composer) params.set("composer", row.composer);
   if (row.web) params.set("web", row.web);
+  try {
+    new URL(row.license);
+  } catch {
+    params.set("license", row.license);
+  }
+  return params;
+}
+
+function _detailFormatterEn(_index, row) {
+  const midiURL = `${midiDB}/${row.file}`;
+  const params = toURLSearchParams(row);
   const query = params.toString();
   const license = toLicense(row.license);
   const web = toLink(row.web, row.web);
@@ -480,11 +492,7 @@ function _detailFormatterEn(_index, row) {
 
 function _detailFormatterJa(_index, row) {
   const midiURL = `${midiDB}/${row.file}`;
-  const params = new URLSearchParams();
-  params.set("url", midiURL);
-  if (row.title) params.set("title", row.title);
-  if (row.composer) params.set("composer", row.composer);
-  if (row.web) params.set("web", row.web);
+  const params = toURLSearchParams(row);
   const query = params.toString();
   const license = toLicense(row.license);
   const web = toLink(row.web, row.web);

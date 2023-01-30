@@ -703,7 +703,7 @@ fetch(`${midiDB}/${document.documentElement.lang}.json`)
     const searchClearButton = toolbar.children[1].querySelector("button");
     searchClearButton.addEventListener("click", () => {
       $table.bootstrapTable("filterBy", {}, {
-        "filterAlgorithm": true,
+        "filterAlgorithm": () => true,
       });
     });
     addFilterControl();

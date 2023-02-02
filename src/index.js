@@ -279,64 +279,63 @@ function addFilterControl() {
     const name = th.dataset.field;
     const fht = th.querySelector("div.fht-cell");
     const input = document.createElement("input");
-    input.value = filterStates.get(name);
     input.type = "search";
     input.className = "form-control";
-    switch (name) {
-      case "born":
-        input.placeHolder = ">1850";
-        input.onchange = () => {
-          filterColumn(name, input.value, filterByRange);
-        };
-        break;
-      case "died":
-        input.placeHolder = "<1920";
-        input.onchange = () => {
-          filterColumn(name, input.value, filterByRange);
-        };
-        break;
-      case "difficulty":
-        input.placeHolder = "<50";
-        input.onchange = () => {
-          filterColumn(name, input.value, filterByRange);
-        };
-        break;
-      case "bpm":
-        input.placeHolder = "<120";
-        input.onchange = () => {
-          filterColumn(name, input.value, filterByRange);
-        };
-        break;
-      case "time":
-        input.placeHolder = ">30(sec)";
-        input.onchange = () => {
-          filterColumn(name, input.value, filterByTime);
-        };
-        break;
-      default:
-        input.onchange = () => {
-          filterColumn(name, input.value, filterByPartialMatch);
-        };
-        break;
-    }
+    const placeholder = getFilterPlaceholder(name);
+    if (placeholder) input.placeholder = placeholder;
+    input.onchange = () => {
+      filterTable(name, input.value);
+    };
     fht.replaceChildren(input);
   });
 }
 
-function filterColumn(name, text, callback) {
-  filterStates.set(name, text);
-  if (text == "") {
-    $table.bootstrapTable("filterBy", {}, {
-      "filterAlgorithm": () => true,
-    });
-    $table.bootstrapTable("resetView");
-  } else {
-    $table.bootstrapTable("filterBy", {}, {
-      "filterAlgorithm": (row) => {
-        return callback(text, row[name]);
-      },
-    });
+function getFilterPlaceholder(name) {
+  switch (name) {
+    case "born":
+      return ">1850";
+    case "died":
+      return "<1920";
+    case "difficulty":
+      return "<50";
+    case "bpm":
+      return "<120";
+    case "time":
+      return ">30(sec)";
   }
+}
+
+function getFilterFunction(name) {
+  switch (name) {
+    case "born":
+    case "died":
+    case "difficulty":
+    case "bpm":
+      return filterByRange;
+    case "time":
+      return filterByTime;
+    default:
+      return filterByPartialMatch;
+  }
+}
+
+function filterTable(name, text) {
+  filterTexts.set(name, text);
+  $table.bootstrapTable("filterBy", {}, {
+    "filterAlgorithm": (row) => {
+      let state = true;
+      for (const [columnName, columnText] of filterTexts.entries()) {
+        if (columnText == "") continue;
+        const func = getFilterFunction(columnName);
+        const columnState = func(columnText, row[columnName]);
+        if (!columnState) {
+          state = false;
+          break;
+        }
+      }
+      return state;
+    },
+  });
 }
 
 function filterByPartialMatch(text, value) {
@@ -649,14 +648,14 @@ function typeEvent(event) {
   }
 }
 
-function initFilterStates() {
-  const states = new Map();
+function initFilterTexts() {
+  const texts = new Map();
   const ths = document.querySelectorAll("#midiList > thead > tr > th");
   [...ths].slice(1).forEach((th) => {
     const name = th.dataset.field;
-    states.set(name, "");
+    texts.set(name, "");
   });
-  return states;
+  return texts;
 }
 
 loadConfig();
@@ -677,7 +676,7 @@ const player = new core.SoundFontPlayer(
   undefined,
   playerCallback,
 );
-const filterStates = initFilterStates();
+const filterTexts = initFilterTexts();
 let currentTime = 0;
 let ns;
 let nsCache;

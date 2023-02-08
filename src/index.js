@@ -658,6 +658,47 @@ function initFilterTexts() {
   return texts;
 }
 
+function fetchData() {
+  return fetch(`${midiDB}/${document.documentElement.lang}0.json`)
+    .then((response) => response.json())
+    .then((data) => {
+      $table.bootstrapTable("load", data);
+      addFilterControl();
+      insturmentsPromise.then((list) => {
+        data.forEach((info) => {
+          info.instruments = getInstrumentsString(list, info);
+        });
+      });
+      fetchAllData();
+    });
+}
+
+function fetchAllData() {
+  return fetch(`${midiDB}/${document.documentElement.lang}.json`)
+    .then((response) => response.json())
+    .then((data) => {
+      $table.bootstrapTable("load", data);
+      addFilterControl();
+      // TODO: column-switch.bs.table does not work
+      const toolbar = document.querySelector(".buttons-toolbar");
+      [...toolbar.querySelectorAll("input")].forEach((input) => {
+        input.addEventListener("change", addFilterControl);
+      });
+      // TODO: data-show-search-clear-button doew not work
+      const searchClearButton = toolbar.children[1].querySelector("button");
+      searchClearButton.addEventListener("click", () => {
+        $table.bootstrapTable("filterBy", {}, {
+          "filterAlgorithm": () => true,
+        });
+      });
+      insturmentsPromise.then((list) => {
+        data.forEach((info) => {
+          info.instruments = getInstrumentsString(list, info);
+        });
+      });
+    });
+}
+
 loadConfig();
 const midiDB = "https://midi-db.pages.dev";
 const $table = $("#midiList");
@@ -684,29 +725,7 @@ let configChanged = false;
 let timer;
 
 const insturmentsPromise = loadInstruments();
-fetch(`${midiDB}/${document.documentElement.lang}.json`)
-  .then((response) => response.json())
-  .then((data) => {
-    insturmentsPromise.then((list) => {
-      data.forEach((info) => {
-        info.instruments = getInstrumentsString(list, info);
-      });
-    });
-    $table.bootstrapTable("load", data);
-    // TODO: column-switch.bs.table does not work
-    const toolbar = document.querySelector(".buttons-toolbar");
-    [...toolbar.querySelectorAll("input")].forEach((input) => {
-      input.addEventListener("change", addFilterControl);
-    });
-    // TODO: data-show-search-clear-button doew not work
-    const searchClearButton = toolbar.children[1].querySelector("button");
-    searchClearButton.addEventListener("click", () => {
-      $table.bootstrapTable("filterBy", {}, {
-        "filterAlgorithm": () => true,
-      });
-    });
-    addFilterControl();
-  });
+fetchData();
 
 document.getElementById("toggleDarkMode").onclick = toggleDarkMode;
 document.getElementById("lang").onchange = changeLang;

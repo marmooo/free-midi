@@ -449,6 +449,7 @@ function _detailFormatterEn(_index, row) {
     </table>
     <h5 class="pt-3">Game</h5>
     <table class="table table-sm table-striped w-auto">
+      <tr><th>Modern</th><td><a href="https://marmooo.github.io/tip-tap-rhythm/?${query}">Tip Tap Rhythm</a></td></tr>
       <tr><th>Classic</th><td><a href="https://marmooo.github.io/tip-tap-notes/?${query}">Tip Tap Notes</a></td></tr>
       <tr><th>TODO</th><td>Coming soon.</td></tr>
     </table>
@@ -511,6 +512,7 @@ function _detailFormatterJa(_index, row) {
     </table>
     <h5 class="pt-3">ゲーム</h5>
     <table class="table table-sm table-striped w-auto">
+      <tr><th>Modern</th><td><a href="https://marmooo.github.io/tip-tap-rhythm/?${query}">Tip Tap Rhythm</a></td></tr>
       <tr><th>Classic</th><td><a href="https://marmooo.github.io/tip-tap-notes/?${query}">Tip Tap Notes</a></td></tr>
       <tr><th>TODO</th><td>Coming soon.</td></tr>
     </table>

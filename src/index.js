@@ -20,61 +20,349 @@ function changeLang() {
   location.href = `/free-midi/${lang}/`;
 }
 
-function unlockAudio() {
-  player.resumeContext();
+class MagentaPlayer extends core.SoundFontPlayer {
+  constructor(ns, runCallback, stopCallback) {
+    const soundFontUrl =
+      "https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus";
+    const callback = {
+      run: (note) => runCallback(note),
+      stop: () => stopCallback(),
+    };
+    super(soundFontUrl, undefined, undefined, undefined, callback);
+    this.ns = ns;
+    this.output.volume.value = 20 * Math.log(0.5) / Math.log(10);
+  }
+
+  async loadSamples(ns) {
+    await super.loadSamples(ns);
+    this.synth = true;
+    this.ns = ns;
+  }
+
+  start(ns) {
+    return super.start(ns);
+  }
+
+  restart(seconds) {
+    if (seconds) {
+      return super.start(this.ns, undefined, seconds / ns.ticksPerQuarter);
+    } else {
+      return this.start(this.ns);
+    }
+  }
+
+  stop(callStop) {
+    if (!callStop) super.stop();
+  }
+
+  resume(seconds) {
+    super.resume();
+    this.seekTo(seconds);
+  }
+
+  changeVolume(volume) {
+    // 0 <= volume <= 100 --> 1e-5 <= dB <= 1 --> -100 <= slider <= 0
+    if (volume == 0) {
+      volume = -100;
+    } else {
+      volume = 20 * Math.log(volume / 100) / Math.log(10);
+    }
+    this.output.volume.value = volume;
+  }
+
+  changeMute(status) {
+    this.output.mute = status;
+  }
+}
+
+class SoundFontPlayer {
+  constructor(stopCallback) {
+    this.context = new AudioContext();
+    this.state = "stopped";
+    this.callStop = false;
+    this.stopCallback = stopCallback;
+    this.prevGain = 0.5;
+    this.cacheUrls = new Array(128);
+  }
+
+  async loadSoundFontDir(ns, dir) {
+    const programs = new Set();
+    ns.notes.forEach((note) => programs.add(note.program));
+    const promises = [...programs].map((program) => {
+      const programId = program.toString().padStart(3, "0");
+      const url = `${dir}/${programId}.sf3`;
+      if (this.cacheUrls[program]) return false;
+      if (this.cacheUrls[program] == url) return true;
+      this.cacheUrls[program] = url;
+      return this.fetchBuffer(url);
+    });
+    const buffers = await Promise.all(promises);
+    for (const buffer of buffers) {
+      if (buffer instanceof ArrayBuffer) {
+        await this.loadSoundFontBuffer(buffer);
+      }
+    }
+  }
+
+  async fetchBuffer(url) {
+    const response = await fetch(url);
+    if (response.status == 200) {
+      return await response.arrayBuffer();
+    } else {
+      return undefined;
+    }
+  }
+
+  async loadSoundFontUrl(url) {
+    const buffer = await this.fetchBuffer(url);
+    const soundFontId = await this.loadSoundFontBuffer(buffer);
+    return soundFontId;
+  }
+
+  async loadSoundFontBuffer(soundFontBuffer) {
+    if (this.synth) {
+      await this.synth.unloadSFontAsync(this.soundFontId);
+    } else {
+      await this.context.audioWorklet.addModule(
+        "https://cdn.jsdelivr.net/npm/js-synthesizer@1.8.5/externals/libfluidsynth-2.3.0-with-libsndfile.min.js",
+      );
+      await this.context.audioWorklet.addModule(
+        "https://cdn.jsdelivr.net/npm/js-synthesizer@1.8.5/dist/js-synthesizer.worklet.min.js",
+      );
+      this.synth = new JSSynth.AudioWorkletNodeSynthesizer();
+      this.synth.init(this.context.sampleRate);
+      const node = this.synth.createAudioNode(this.context);
+      node.connect(this.context.destination);
+    }
+    const soundFontId = await this.synth.loadSFont(soundFontBuffer);
+    return soundFontId;
+  }
+
+  resumeContext() {
+    this.context.resume();
+  }
+
+  async loadNoteSequence(ns) {
+    await this.synth.resetPlayer();
+    this.ns = ns;
+    const midiBuffer = core.sequenceProtoToMidi(ns);
+    return player.synth.addSMFDataToPlayer(midiBuffer);
+  }
+
+  async restart(seconds) {
+    this.state = "started";
+    await this.synth.playPlayer();
+    this.seekTo(seconds);
+    await this.synth.waitForPlayerStopped();
+    await this.synth.waitForVoicesStopped();
+    if (this.callStop) {
+      this.stopCallback();
+      this.callStop = false;
+    }
+  }
+
+  async start(ns, _qpm, seconds) {
+    if (ns) await this.loadNoteSequence(ns);
+    if (seconds) this.seekTo(seconds);
+    this.restart();
+  }
+
+  stop(callStop) {
+    if (this.isPlaying()) {
+      this.state = "stopped";
+      this.callStop = callStop;
+      this.synth.stopPlayer();
+      this.seekTo(0);
+    } else if (callStop) {
+      this.callStop = callStop;
+      this.seekTo(0);
+      this.stopCallback();
+    }
+  }
+
+  pause() {
+    this.state = "paused";
+    this.synth.stopPlayer();
+  }
+
+  resume(seconds) {
+    this.restart(seconds);
+  }
+
+  changeVolume(volume) {
+    // 0 <= volume <= 1
+    volume = volume / 100;
+    this.synth.setGain(volume);
+  }
+
+  changeMute(status) {
+    if (status) {
+      this.prevGain = this.synth.getGain();
+      this.synth.setGain(0);
+    } else {
+      this.synth.setGain(this.prevGain);
+    }
+  }
+
+  calcTick(seconds) {
+    let tick = 0;
+    let prevTime = 0;
+    let prevQpm = 120;
+    for (const tempo of this.ns.tempos) {
+      const currTime = tempo.time;
+      const currQpm = tempo.qpm;
+      if (currTime < seconds) {
+        const t = currTime - prevTime;
+        tick += prevQpm / 60 * t * this.ns.ticksPerQuarter;
+      } else {
+        const t = seconds - prevTime;
+        tick += prevQpm / 60 * t * this.ns.ticksPerQuarter;
+        return tick;
+      }
+      prevTime = currTime;
+      prevQpm = currQpm;
+    }
+    const t = seconds - prevTime;
+    tick += prevQpm / 60 * t * this.ns.ticksPerQuarter;
+    return tick;
+  }
+
+  seekTo(seconds) {
+    const tick = this.calcTick(seconds);
+    this.synth.seekPlayer(tick);
+  }
+
+  isPlaying() {
+    if (!this.synth) return false;
+    return this.synth.isPlaying();
+  }
+
+  getPlayState() {
+    if (!this.synth) return "stopped";
+    if (this.synth.isPlaying()) return "started";
+    return this.state;
+  }
+}
+
+function stopCallback() {
+  playNext();
+}
+
+function initPlayer() {
+  // // Magenta.js
+  // const runCallback = () => {};
+  // player = new MagentaPlayer(ns, runCallback, stopCallback);
+
+  // js-synthesizer
+  player = new SoundFontPlayer(stopCallback);
+}
+
+async function loadSoundFont() {
+  if (player instanceof SoundFontPlayer) {
+    const soundFontDir = "https://soundfonts.pages.dev/GeneralUser_GS_v1.471";
+    await player.loadSoundFontDir(ns, soundFontDir);
+    await player.loadNoteSequence(ns);
+  }
+}
+
+function setTimer(seconds) {
+  const delay = 100;
+  const startTime = Date.now() - seconds * 1000;
+  const totalTime = ns.totalTime;
+  clearInterval(timer);
+  timer = setInterval(() => {
+    const nextTime = (Date.now() - startTime) / 1000;
+    if (Math.floor(currentTime) != Math.floor(nextTime)) {
+      updateSeekbar(nextTime);
+    }
+    currentTime = nextTime;
+    if (currentTime >= totalTime) {
+      stop(true);
+      clearInterval(timer);
+      currentTime = 0;
+    }
+  }, delay);
+}
+
+// fix delay caused by player.start(ns) by seeking after playing
+function setLoadingTimer(time) {
+  const loadingTimer = setInterval(() => {
+    if (player.isPlaying()) {
+      clearInterval(loadingTimer);
+      player.seekTo(time);
+      setTimer(time);
+      enableController();
+    }
+  }, 10);
+}
+
+function disableController() {
+  controllerDisabled = true;
+  const target = document.getElementById("controller")
+    .querySelectorAll("button, input");
+  [...target].forEach((node) => {
+    node.disabled = true;
+  });
+}
+
+function enableController() {
+  controllerDisabled = false;
+  const target = document.getElementById("controller")
+    .querySelectorAll("button, input");
+  [...target].forEach((node) => {
+    node.disabled = false;
+  });
+}
+
+function stop(callStop) {
+  document.getElementById("currentTime").textContent = formatTime(0);
+  player.stop(callStop);
 }
 
 function speedDown() {
+  if (player.isPlaying()) disableController();
   const input = document.getElementById("speed");
   const value = parseInt(input.value) - 10;
-  const speed = (value < 0) ? 0 : value;
+  const speed = (value < 0) ? 1 : value;
   input.value = speed;
-  document.getElementById("speedDown").disabled = true;
   changeSpeed(speed);
-  document.getElementById("speedDown").disabled = false;
 }
 
 function speedUp() {
+  if (player.isPlaying()) disableController();
   const input = document.getElementById("speed");
   const speed = parseInt(input.value) + 10;
   input.value = speed;
-  document.getElementById("speedUp").disabled = true;
   changeSpeed(speed);
-  document.getElementById("speedUp").disabled = false;
 }
 
-function changeSpeed(speed) {
+async function changeSpeed(speed) {
   if (!ns) return;
-  switch (player.getPlayState()) {
-    case "started": {
-      player.stop();
-      clearInterval(timer);
-      const prevRate = nsCache.totalTime / ns.totalTime;
-      const rate = prevRate / (speed / 100);
-      const newSeconds = currentTime * rate;
-      setSpeed(ns, speed);
-      initSeekbar(ns, newSeconds);
-      player.start(ns, undefined, newSeconds);
-      setTimer(newSeconds);
-      break;
-    }
-    case "paused": {
-      setSpeed(ns, speed);
-      const prevRate = nsCache.totalTime / ns.totalTime;
-      const rate = prevRate / (speed / 100);
-      const newSeconds = currentTime * rate;
-      initSeekbar(ns, newSeconds);
-      break;
-    }
+  const playState = player.getPlayState();
+  player.stop();
+  clearInterval(timer);
+  const prevRate = nsCache.totalTime / ns.totalTime;
+  const rate = prevRate / (speed / 100);
+  const newSeconds = currentTime * rate;
+  setSpeed(ns, speed);
+  initSeekbar(ns, newSeconds);
+  if (playState == "started") {
+    setLoadingTimer(newSeconds);
+    player.start(ns);
+  } else if (player instanceof SoundFontPlayer) {
+    await player.loadNoteSequence(ns);
+    player.seekTo(newSeconds);
   }
 }
 
 function changeSpeedEvent(event) {
+  if (player.isPlaying()) disableController();
   const speed = parseInt(event.target.value);
   changeSpeed(speed);
 }
 
 function setSpeed(ns, speed) {
+  if (speed <= 0) speed = 1;
   speed /= 100;
   const controlChanges = nsCache.controlChanges;
   ns.controlChanges.forEach((n, i) => {
@@ -84,6 +372,10 @@ function setSpeed(ns, speed) {
   ns.tempos.forEach((n, i) => {
     n.time = tempos[i].time / speed;
     n.qpm = tempos[i].qpm * speed;
+  });
+  const timeSignatures = nsCache.timeSignatures;
+  ns.timeSignatures.forEach((n, i) => {
+    n.time = timeSignatures[i].time / speed;
   });
   const notes = nsCache.notes;
   ns.notes.forEach((n, i) => {
@@ -103,12 +395,12 @@ function volumeOnOff() {
   if (i.classList.contains("bi-volume-up-fill")) {
     i.className = "bi bi-volume-mute-fill";
     volumebar.dataset.value = volumebar.value;
-    volumebar.value = -50;
-    player.output.mute = true;
+    volumebar.value = 0;
+    player.changeMute(true);
   } else {
     i.className = "bi bi-volume-up-fill";
     volumebar.value = volumebar.dataset.value;
-    player.output.mute = false;
+    player.changeMute(false);
   }
 }
 
@@ -116,7 +408,7 @@ function changeVolumebar() {
   const volumebar = document.getElementById("volumebar");
   const volume = volumebar.value;
   volumebar.dataset.value = volume;
-  player.output.volume.value = volume;
+  player.changeVolume(volume);
 }
 
 function setNoteInstruments(ns) {
@@ -143,14 +435,11 @@ function formatTime(seconds) {
 
 function changeSeekbar(event) {
   clearInterval(timer);
-  const seconds = parseInt(event.target.value);
-  document.getElementById("currentTime").textContent = formatTime(seconds);
-  currentTime = seconds;
-  if (player.isPlaying()) {
-    player.seekTo(seconds);
-    if (player.getPlayState() == "started") {
-      setTimer(seconds);
-    }
+  currentTime = parseInt(event.target.value);
+  document.getElementById("currentTime").textContent = formatTime(currentTime);
+  if (player.getPlayState() == "started") {
+    player.seekTo(currentTime);
+    setTimer(currentTime);
   }
 }
 
@@ -168,25 +457,23 @@ function initSeekbar(ns, seconds) {
   document.getElementById("currentTime").textContent = formatTime(seconds);
 }
 
-function setTimer(seconds) {
-  const delay = 100;
-  const startTime = Date.now() - seconds * 1000;
-  const totalTime = ns.totalTime;
-  timer = setInterval(() => {
-    const nextTime = (Date.now() - startTime) / 1000;
-    if (Math.floor(currentTime) != Math.floor(nextTime)) {
-      updateSeekbar(nextTime);
-    }
-    currentTime = nextTime;
-    if (currentTime >= totalTime) {
-      clearInterval(timer);
-      currentTime = 0;
-    }
-  }, delay);
-}
-
 async function loadMIDI(url) {
+  const waitTime = 0.2;
   ns = await core.urlToNoteSequence(url);
+  ns.totalTime += waitTime;
+  ns.notes.forEach((note) => {
+    note.startTime += waitTime;
+    note.endTime += waitTime;
+  });
+  ns.controlChanges.forEach((cc) => {
+    cc.time += waitTime;
+  });
+  ns.tempos.slice(1).forEach((tempo) => {
+    tempo.time += waitTime;
+  });
+  ns.timeSignatures.slice(1).forEach((ts) => {
+    ts.time += waitTime;
+  });
   nsCache = core.sequences.clone(ns);
   ns.controlChanges.forEach((n) => n.p = n.program);
   ns.notes.map((note) => {
@@ -194,16 +481,23 @@ async function loadMIDI(url) {
   });
 }
 
-function playMIDI(seconds) {
+function unlockAudio() {
+  player.resumeContext();
+}
+
+async function playMIDI(seconds) {
+  disableController();
   clearInterval(timer);
   setNoteInstruments(ns);
+  await loadSoundFont();
   const speed = parseInt(document.getElementById("speed").value);
   setSpeed(ns, speed);
-  const volume = document.getElementById("volumebar").value;
-  player.output.volume.value = volume;
-  player.start(ns, undefined, seconds);
-  setTimer(seconds);
+  const volume = parseInt(document.getElementById("volumebar").value);
+  player.changeVolume(volume);
+  setLoadingTimer(seconds);
+  player.start(ns);
   initSeekbar(ns, seconds);
+  enableController();
 }
 
 function playNext() {
@@ -254,16 +548,18 @@ function loadInstruments() {
     });
 }
 
-function changeInstruments() {
+async function changeInstruments() {
   switch (player.getPlayState()) {
     case "started": {
       player.stop();
       setNoteInstruments(ns);
+      await loadSoundFont();
       const speed = parseInt(document.getElementById("speed").value);
       setSpeed(ns, speed);
       const seconds = parseInt(document.getElementById("seekbar").value);
-      player.start(ns, undefined, seconds);
       initSeekbar(ns, seconds);
+      setLoadingTimer(seconds);
+      player.start(ns);
       break;
     }
     case "paused":
@@ -599,9 +895,8 @@ function replay(node) {
     playMIDI(seconds / speed);
     configChanged = false;
   } else {
-    player.resume();
-    const seconds = parseInt(document.getElementById("seekbar").value);
-    setTimer(seconds);
+    player.resume(currentTime);
+    setTimer(currentTime);
   }
 }
 
@@ -635,6 +930,9 @@ function getInstrumentsString(list, info) {
 }
 
 function typeEvent(event) {
+  if (!player) return;
+  if (controllerDisabled) return;
+  player.resumeContext();
   switch (event.code) {
     case "Space":
       event.preventDefault();
@@ -704,29 +1002,17 @@ function fetchAllData() {
 loadConfig();
 const midiDB = "https://midi-db.pages.dev";
 const $table = $("#midiList");
-const soundFont =
-  "https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus";
-const playerCallback = {
-  run: () => {},
-  stop: () => {
-    playNext();
-  },
-};
-const player = new core.SoundFontPlayer(
-  soundFont,
-  undefined,
-  undefined,
-  undefined,
-  playerCallback,
-);
 const filterTexts = initFilterTexts();
+let controllerDisabled;
 let currentTime = 0;
 let ns;
 let nsCache;
 let configChanged = false;
 let timer;
+let player;
 
 const insturmentsPromise = loadInstruments();
+initPlayer();
 fetchData();
 
 document.getElementById("toggleDarkMode").onclick = toggleDarkMode;

@@ -133,7 +133,7 @@ table.rc-table-resizing thead > th > a {
     </header>
     <main class="container">
       <p>Free MIDI Search for everyone. Free to listen, copy, play, etc.</p>
-      <div class="d-flex flex-wrap justify-content-between mb-2">
+      <div id="controller" class="d-flex flex-wrap justify-content-between mb-2">
         <div class="d-flex">
           <div class="d-inline">
             <button title="speed down" id="speedDown" class="btn btn-sm btn-light"><i class="bi bi-chevron-double-left"></i></button>
@@ -143,7 +143,7 @@ table.rc-table-resizing thead > th > a {
           <button title="repeat" id="repeat" class="btn btn-sm btn-light"><i class="bi bi-repeat"></i></button>
           <button title="volume ON/OFF" id="volumeOnOff" class="btn btn-sm btn-light"><i class="bi bi-volume-up-fill"></i></button>
           <div class="d-flex align-items-center">
-            <input type="range" id="volumebar" class="form-range" min="-50" max="0" value="0" step="1">
+            <input type="range" id="volumebar" class="form-range" min="0" max="100" value="50" step="1">
           </div>
         </div>
         <div class="d-flex flex-nowrap align-items-center">
@@ -266,7 +266,7 @@ table.rc-table-resizing thead > th > a {
       </div>
       <div class="text-muted">&copy; <a href="https://github.com/marmooo">marmooo</a></div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.77,npm/@magenta/music@1.23.1/es6/core.js,npm/jquery@3.6.2/dist/jquery.min.js,npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js,npm/jquery-resizable-columns@0.2.3/dist/jquery.resizableColumns.min.js,npm/bootstrap-table@1.21.2/dist/bootstrap-table.min.js,npm/bootstrap-table@1.21.2/dist/extensions/filter-control/bootstrap-table-filter-control.min.js,npm/bootstrap-table@1.21.2/dist/extensions/fixed-columns/bootstrap-table-fixed-columns.min.js,npm/bootstrap-table@1.21.2/dist/extensions/resizable/bootstrap-table-resizable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.77,npm/@magenta/music@1.23.1/es6/core.js,npm/jquery@3.6.2/dist/jquery.min.js,npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js,npm/jquery-resizable-columns@0.2.3/dist/jquery.resizableColumns.min.js,npm/bootstrap-table@1.21.2/dist/bootstrap-table.min.js,npm/bootstrap-table@1.21.2/dist/extensions/filter-control/bootstrap-table-filter-control.min.js,npm/bootstrap-table@1.21.2/dist/extensions/fixed-columns/bootstrap-table-fixed-columns.min.js,npm/bootstrap-table@1.21.2/dist/extensions/resizable/bootstrap-table-resizable.min.js,npm/js-synthesizer@1.8.5/externals/libfluidsynth-2.3.0-with-libsndfile.min.js,npm/js-synthesizer@1.8.5/dist/js-synthesizer.min.js"></script>
     <script src="/free-midi/index.js"></script>
   </body>
 </html>

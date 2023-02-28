@@ -126,6 +126,8 @@ table.rc-table-resizing thead > th > a {
               <option value="ja" selected>日本語</option>
               <option value="en">English</option>
             </select>
+            <button title="設定" id="config" class="fs-4 btn p-0 ms-1"
+              data-bs-toggle="offcanvas" data-bs-target="#configPanel" aria-controls="configPanel">⚙️</button>
             <button title="ダークモード切替" id="toggleDarkMode" class="fs-4 btn p-0 ms-1">🌓</button>
           </div>
         </div>
@@ -154,9 +156,6 @@ table.rc-table-resizing thead > th > a {
           </div>
           <input type="range" id="seekbar" class="form-range">
         </div>
-        <select title="楽器を選択して再生" id="instruments" class="form-select form-select-sm w-auto">
-          <option>すべての楽器で再生</option>
-        </select>
         <div class="buttons-toolbar ms-1"></div>
       </div>
       <div class="table-responsive text-nowrap">
@@ -254,6 +253,28 @@ table.rc-table-resizing thead > th > a {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="configPanel" aria-labelledby="configPanelLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="configPanelLabel">設定</h5>
+          <button class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close" type="button"></button>
+        </div>
+        <div class="offcanvas-body">
+          <h6>楽器</h6>
+          <select title="楽器を選択して再生" id="instruments" class="form-select form-select-sm w-auto">
+            <option>すべての楽器で再生</option>
+          </select>
+          <h6 class="pt-4">サウンドフォント</h6>
+          <select title="サウンドフォントを選択して再生" id="soundfonts" class="form-select form-select-sm w-auto">
+            <option disabled>サウンドフォントを選択</option>
+          </select>
+          <input title="サウンドフォントを選択" type="file" class="form-control mt-3" id="inputSoundFontFile" accept=".sf2, .sf3">
+          <div class="input-group">
+            <label class="input-group-text" for="inputSoundFontUrl">URL から選択</label>
+            <input title="URL から選択" type="url" class="form-control" id="inputSoundFontUrl"
+              placeholder="https://soundfonts.pages.dev/TimGM6mb.128.sf3">
           </div>
         </div>
       </div>

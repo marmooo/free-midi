@@ -91,7 +91,6 @@ class SoundFontPlayer {
     const promises = [...programs].map((program) => {
       const programId = program.toString().padStart(3, "0");
       const url = `${dir}/${programId}.sf3`;
-      if (this.cacheUrls[program]) return false;
       if (this.cacheUrls[program] == url) return true;
       this.cacheUrls[program] = url;
       return this.fetchBuffer(url);
@@ -257,9 +256,13 @@ function initPlayer() {
   player = new SoundFontPlayer(stopCallback);
 }
 
-async function loadSoundFont() {
+async function loadSoundFont(name) {
   if (player instanceof SoundFontPlayer) {
-    const soundFontDir = "https://soundfonts.pages.dev/GeneralUser_GS_v1.471";
+    if (!name) {
+      const soundfonts = document.getElementById("soundfonts")
+      name = soundfonts.options[soundfonts.selectedIndex].value;
+    }
+    const soundFontDir = `https://soundfonts.pages.dev/${name}`;
     await player.loadSoundFontDir(ns, soundFontDir);
     await player.loadNoteSequence(ns);
   }
@@ -411,17 +414,6 @@ function changeVolumebar() {
   player.changeVolume(volume);
 }
 
-function setNoteInstruments(ns) {
-  const index = document.getElementById("instruments").selectedIndex - 1;
-  if (index > 0) {
-    ns.controlChanges.forEach((n) => n.program = index);
-    ns.notes.forEach((n) => n.program = index);
-  } else {
-    ns.controlChanges.forEach((n) => n.program = n.p);
-    ns.notes.forEach((n) => n.program = n.p);
-  }
-}
-
 function formatTime(seconds) {
   seconds = Math.floor(seconds);
   const s = seconds % 60;
@@ -481,6 +473,24 @@ async function loadMIDI(url) {
   });
 }
 
+async function loadSoundFontFileEvent(event) {
+  if (player) {
+    document.getElementById("soundfonts").options[0].selected = true;
+    const file = event.target.files[0];
+    const soundFontBuffer = await file.arrayBuffer();
+    await player.loadSoundFontBuffer(soundFontBuffer);
+  }
+}
+
+async function loadSoundFontUrlEvent(event) {
+  if (player) {
+    document.getElementById("soundfonts").options[0].selected = true;
+    const response = await fetch(event.target.value);
+    const soundFontBuffer = await response.arrayBuffer();
+    await player.loadSoundFontBuffer(soundFontBuffer);
+  }
+}
+
 function unlockAudio() {
   player.resumeContext();
 }
@@ -530,7 +540,34 @@ function playNext() {
   }
 }
 
-function loadInstruments() {
+function setNoteInstruments(ns) {
+  const index = document.getElementById("instruments").selectedIndex - 1;
+  if (index > 0) {
+    ns.controlChanges.forEach((n) => n.program = index);
+    ns.notes.forEach((n) => n.program = index);
+  } else {
+    ns.controlChanges.forEach((n) => n.program = n.p);
+    ns.notes.forEach((n) => n.program = n.p);
+  }
+}
+
+function loadSoundFontList() {
+  return fetch("https://soundfonts.pages.dev/list.json")
+    .then((response) => response.json())
+    .then((data) => {
+      const soundfonts = document.getElementById("soundfonts");
+      data.forEach((info) => {
+        const option = document.createElement("option");
+        option.textContent = info.name;
+        if (info.name == "GeneralUser_GS_v1.471") {
+          option.selected = true;
+        }
+        soundfonts.appendChild(option);
+      });
+    });
+}
+
+function loadInstrumentList() {
   const langObj = document.getElementById("lang");
   const lang = langObj.options[langObj.selectedIndex].value;
   const instruments = document.getElementById("instruments");
@@ -548,7 +585,7 @@ function loadInstruments() {
     });
 }
 
-async function changeInstruments() {
+async function changeConfig() {
   switch (player.getPlayState()) {
     case "started": {
       player.stop();
@@ -964,7 +1001,7 @@ function fetchData() {
     .then((data) => {
       $table.bootstrapTable("load", data);
       addFilterControl();
-      insturmentsPromise.then((list) => {
+      instrumentListPromise.then((list) => {
         data.forEach((info) => {
           info.instruments = getInstrumentsString(list, info);
         });
@@ -991,7 +1028,7 @@ function fetchAllData() {
           "filterAlgorithm": () => true,
         });
       });
-      insturmentsPromise.then((list) => {
+      instrumentListPromise.then((list) => {
         data.forEach((info) => {
           info.instruments = getInstrumentsString(list, info);
         });
@@ -1011,7 +1048,8 @@ let configChanged = false;
 let timer;
 let player;
 
-const insturmentsPromise = loadInstruments();
+const instrumentListPromise = loadInstrumentList();
+loadSoundFontList();
 initPlayer();
 fetchData();
 
@@ -1024,7 +1062,10 @@ document.getElementById("repeat").onclick = repeat;
 document.getElementById("volumeOnOff").onclick = volumeOnOff;
 document.getElementById("volumebar").onchange = changeVolumebar;
 document.getElementById("seekbar").onchange = changeSeekbar;
-document.getElementById("instruments").onchange = changeInstruments;
+document.getElementById("instruments").onchange = changeConfig;
+document.getElementById("soundfonts").onchange = changeConfig;
+document.getElementById("inputSoundFontFile").onchange = loadSoundFontFileEvent;
+document.getElementById("inputSoundFontUrl").onchange = loadSoundFontUrlEvent;
 document.addEventListener("keydown", typeEvent);
 document.addEventListener("click", unlockAudio, {
   once: true,

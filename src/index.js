@@ -258,7 +258,7 @@ function initPlayer() {
 async function loadSoundFont(name) {
   if (player instanceof SoundFontPlayer) {
     if (!name) {
-      const soundfonts = document.getElementById("soundfonts")
+      const soundfonts = document.getElementById("soundfonts");
       name = soundfonts.options[soundfonts.selectedIndex].value;
     }
     const soundFontDir = `https://soundfonts.pages.dev/${name}`;

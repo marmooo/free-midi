@@ -51,10 +51,6 @@ class MagentaPlayer extends core.SoundFontPlayer {
     }
   }
 
-  stop(callStop) {
-    if (!callStop) super.stop();
-  }
-
   resume(seconds) {
     super.resume();
     this.seekTo(seconds);
@@ -83,6 +79,7 @@ class SoundFontPlayer {
     this.stopCallback = stopCallback;
     this.prevGain = 0.5;
     this.cacheUrls = new Array(128);
+    this.totalTicks = 0;
   }
 
   async loadSoundFontDir(ns, dir) {
@@ -136,15 +133,16 @@ class SoundFontPlayer {
     return soundFontId;
   }
 
-  resumeContext() {
-    this.context.resume();
-  }
-
   async loadNoteSequence(ns) {
     await this.synth.resetPlayer();
     this.ns = ns;
     const midiBuffer = core.sequenceProtoToMidi(ns);
+    this.totalTicks = this.calcTick(ns.totalTime);
     return player.synth.addSMFDataToPlayer(midiBuffer);
+  }
+
+  resumeContext() {
+    this.context.resume();
   }
 
   async restart(seconds) {
@@ -153,9 +151,11 @@ class SoundFontPlayer {
     this.seekTo(seconds);
     await this.synth.waitForPlayerStopped();
     await this.synth.waitForVoicesStopped();
-    if (this.callStop) {
+    this.state = "paused";
+    const currentTick = await this.synth.retrievePlayerCurrentTick();
+    if (this.totalTicks <= currentTick) {
+      player.seekTo(0);
       this.stopCallback();
-      this.callStop = false;
     }
   }
 
@@ -165,16 +165,9 @@ class SoundFontPlayer {
     this.restart();
   }
 
-  stop(callStop) {
+  stop() {
     if (this.isPlaying()) {
-      this.state = "stopped";
-      this.callStop = callStop;
       this.synth.stopPlayer();
-      this.seekTo(0);
-    } else if (callStop) {
-      this.callStop = callStop;
-      this.seekTo(0);
-      this.stopCallback();
     }
   }
 
@@ -215,14 +208,14 @@ class SoundFontPlayer {
       } else {
         const t = seconds - prevTime;
         tick += prevQpm / 60 * t * this.ns.ticksPerQuarter;
-        return tick;
+        return Math.round(tick);
       }
       prevTime = currTime;
       prevQpm = currQpm;
     }
     const t = seconds - prevTime;
     tick += prevQpm / 60 * t * this.ns.ticksPerQuarter;
-    return tick;
+    return Math.round(tick);
   }
 
   seekTo(seconds) {
@@ -243,6 +236,9 @@ class SoundFontPlayer {
 }
 
 function stopCallback() {
+  clearInterval(timer);
+  currentTime = 0;
+  initSeekbar(ns, 0);
   playNext();
 }
 
@@ -281,9 +277,7 @@ function setTimer(seconds) {
     }
     currentTime = nextTime;
     if (currentTime >= totalTime) {
-      stop(true);
       clearInterval(timer);
-      currentTime = 0;
     }
   }, delay);
 }
@@ -316,11 +310,6 @@ function enableController() {
   [...target].forEach((node) => {
     node.disabled = false;
   });
-}
-
-function stop(callStop) {
-  document.getElementById("currentTime").textContent = formatTime(0);
-  player.stop(callStop);
 }
 
 function speedDown() {

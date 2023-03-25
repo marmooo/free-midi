@@ -988,26 +988,63 @@ function initFilterTexts() {
   return texts;
 }
 
-function fetchData() {
-  return fetch(`${midiDB}/${document.documentElement.lang}0.json`)
-    .then((response) => response.json())
-    .then((data) => {
-      $table.bootstrapTable("load", data);
-      addFilterControl();
-      instrumentListPromise.then((list) => {
-        data.forEach((info) => {
-          info.instruments = getInstrumentsString(list, info);
-        });
-      });
-      fetchAllData();
+async function fetchHeaderPlayList() {
+  const lang = document.documentElement.lang;
+  const response = await fetch(`${midiDB}/${lang}0.json`);
+  const data = await response.json();
+  $table.bootstrapTable("load", data);
+  addFilterControl();
+  instrumentListPromise.then((list) => {
+    data.forEach((info) => {
+      info.instruments = getInstrumentsString(list, info);
     });
+  });
+  fetchPlayList();
 }
 
-function fetchAllData() {
-  return fetch(`${midiDB}/${document.documentElement.lang}.json`)
-    .then((response) => response.json())
-    .then((data) => {
-      $table.bootstrapTable("load", data);
+function shuffle(array) {
+  for (let i = array.length; 1 < i; i--) {
+    const k = Math.floor(Math.random() * i);
+    [array[k], array[i - 1]] = [array[i - 1], array[k]];
+  }
+  return array;
+}
+
+async function fetchPlayList() {
+  const dirs = [
+    "lilypond-songs",
+    "piano-midi.de",
+    "s-pst.info",
+    "music-abc",
+    "tunebook-abc",
+    "ABC_TuneBooks",
+    "mutopia",
+    "煉獄庭園",
+    "魔王魂",
+    "AmorKana",
+    "karugamo",
+    "デジファミ音楽堂",
+  ];
+  shuffle(dirs);
+  const lang = document.documentElement.lang;
+  const firstDir = dirs[0];
+  const firstResponse = await fetch(`${midiDB}/json/${firstDir}/${lang}.json`);
+  const firstData = await firstResponse.json();
+  $table.bootstrapTable("load", firstData);
+  addFilterControl();
+  instrumentListPromise.then((list) => {
+    firstData.forEach((info) => {
+      info.instruments = getInstrumentsString(list, info);
+    });
+  });
+
+  const promises = dirs.slice(1).map(async (dir) => {
+    const response = await fetch(`${midiDB}/json/${dir}/${lang}.json`);
+    return response.json();
+  });
+  Promise.all(promises).then((dataset) => {
+    dataset.forEach((data) => {
+      $table.bootstrapTable("append", data);
       addFilterControl();
       // TODO: column-switch.bs.table does not work
       const toolbar = document.querySelector(".buttons-toolbar");
@@ -1026,11 +1063,13 @@ function fetchAllData() {
           info.instruments = getInstrumentsString(list, info);
         });
       });
-    });
+    })
+  });
 }
 
 loadConfig();
-const midiDB = "https://midi-db.pages.dev";
+// const midiDB = "https://midi-db.pages.dev";
+const midiDB = "/midi-db";
 const $table = $("#midiList");
 const filterTexts = initFilterTexts();
 let controllerDisabled;
@@ -1044,7 +1083,7 @@ let player;
 const instrumentListPromise = loadInstrumentList();
 loadSoundFontList();
 initPlayer();
-fetchData();
+fetchPlayList();
 
 document.getElementById("toggleDarkMode").onclick = toggleDarkMode;
 document.getElementById("lang").onchange = changeLang;

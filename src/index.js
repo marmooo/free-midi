@@ -1068,8 +1068,7 @@ async function fetchPlayList() {
 }
 
 loadConfig();
-// const midiDB = "https://midi-db.pages.dev";
-const midiDB = "/midi-db";
+const midiDB = "https://midi-db.pages.dev";
 const $table = $("#midiList");
 const filterTexts = initFilterTexts();
 let controllerDisabled;

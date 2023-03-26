@@ -1032,6 +1032,7 @@ async function fetchPlayList() {
     "AmorKana",
     "karugamo",
     "デジファミ音楽堂",
+    "takumi.net",
   ];
   shuffle(dirs);
   const lang = document.documentElement.lang;

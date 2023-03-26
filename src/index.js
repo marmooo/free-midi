@@ -1033,6 +1033,7 @@ async function fetchPlayList() {
     "karugamo",
     "デジファミ音楽堂",
     "takumi.net",
+    "LittleMelody+",
   ];
   shuffle(dirs);
   const lang = document.documentElement.lang;

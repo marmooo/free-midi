@@ -256,19 +256,17 @@ function getPrograms(ns) {
   return [...programs];
 }
 
-async function loadSoundFont(name) {
-  if (player instanceof SoundFontPlayer) {
-    if (!name) {
-      const soundfonts = document.getElementById("soundfonts");
-      const index = soundfonts.selectedIndex;
-      if (index == 0) return; // use local file or url
-      name = soundfonts.options[index].value;
-    }
-    const soundFontDir = `https://soundfonts.pages.dev/${name}`;
-    const programs = getPrograms(ns);
-    await player.loadSoundFontDir(programs, soundFontDir);
-    await player.loadNoteSequence(ns);
+async function loadSoundFont(player, name) {
+  if (!name) {
+    const soundfonts = document.getElementById("soundfonts");
+    const index = soundfonts.selectedIndex;
+    if (index == 0) return; // use local file or url
+    name = soundfonts.options[index].value;
   }
+  const soundFontDir = `https://soundfonts.pages.dev/${name}`;
+  const programs = getPrograms(ns);
+  await player.loadSoundFontDir(programs, soundFontDir);
+  await player.loadNoteSequence(ns);
 }
 
 function setTimer(seconds) {
@@ -498,7 +496,9 @@ async function playMIDI(seconds) {
   disableController();
   clearInterval(timer);
   setNoteInstruments(ns);
-  await loadSoundFont();
+  if (player instanceof SoundFontPlayer) {
+    await loadSoundFont(player);
+  }
   const speed = parseInt(document.getElementById("speed").value);
   setSpeed(ns, speed);
   const volume = parseInt(document.getElementById("volumebar").value);
@@ -589,7 +589,9 @@ async function changeConfig() {
     case "started": {
       player.stop();
       setNoteInstruments(ns);
-      await loadSoundFont();
+      if (player instanceof SoundFontPlayer) {
+        await loadSoundFont(player);
+      }
       const speed = parseInt(document.getElementById("speed").value);
       setSpeed(ns, speed);
       const seconds = parseInt(document.getElementById("seekbar").value);

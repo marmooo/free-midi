@@ -10,6 +10,7 @@ function loadConfig(){localStorage.getItem("darkMode")==1&&(document.documentEle
     <table class="table table-sm table-striped w-auto">
       <tr><th>Modern</th><td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-rhythm/?${b}">Tip Tap Rhythm</a></td></tr>
       <tr><th>Classic</th><td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-notes/?${b}">Tip Tap Notes</a></td></tr>
+      <tr><th>Classic</th><td><a target="_blank" rel="noopener" href="https://marmooo.github.io/doremi-piano/?${b}">Doremi Piano</a></td></tr>
       <tr><th>TODO</th><td>Coming soon.</td></tr>
     </table>
   </div>
@@ -59,6 +60,7 @@ function loadConfig(){localStorage.getItem("darkMode")==1&&(document.documentEle
     <table class="table table-sm table-striped w-auto">
       <tr><th>Modern</th><td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-rhythm/?${b}">Tip Tap Rhythm</a></td></tr>
       <tr><th>Classic</th><td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-notes/?${b}">Tip Tap Notes</a></td></tr>
+      <tr><th>Classic</th><td><a target="_blank" rel="noopener" href="https://marmooo.github.io/doremi-piano/?${b}">Doremi Piano</a></td></tr>
       <tr><th>TODO</th><td>Coming soon.</td></tr>
     </table>
   </div>

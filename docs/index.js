@@ -3,14 +3,39 @@ function loadConfig(){localStorage.getItem("darkMode")==1&&(document.documentEle
   <div>
     <h5>Score</h5>
     <table class="table table-sm table-striped w-auto">
-      <tr><th>Basic</th><td><a target="_blank" rel="noopener" href="https://marmooo.github.io/midi2abc/?${b}">midi2abc</a></td></tr>
-      <tr><th>Waterfall</th><td><a target="_blank" rel="noopener" href="https://marmooo.github.io/waterfall-piano/?${b}">Waterfall Piano</a></td></tr>
+      <tr><th>Basic</th>
+        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/midi2abc/?${b}">
+          <img alt="midi2abc" src="https://marmooo.github.io/midi2abc/favicon/favicon.svg" width="16" height="16">
+          midi2abc
+        </a></td>
+      </tr>
+      <tr><th>Waterfall</th>
+        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/waterfall-piano/?${b}">
+          <img alt="Waterfall Piano" src="https://marmooo.github.io/waterfall-piano/favicon/favicon.svg" width="16" height="16">
+          Waterfall Piano
+        </a></td>
+      </tr>
     </table>
     <h5 class="pt-3">Game</h5>
     <table class="table table-sm table-striped w-auto">
-      <tr><th>Modern</th><td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-rhythm/?${b}">Tip Tap Rhythm</a></td></tr>
-      <tr><th>Classic</th><td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-notes/?${b}">Tip Tap Notes</a></td></tr>
-      <tr><th>Classic</th><td><a target="_blank" rel="noopener" href="https://marmooo.github.io/doremi-piano/?${b}">Doremi Piano</a></td></tr>
+      <tr><th>Modern</th>
+        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-rhythm/?${b}">
+          <img alt="Tip Tap Rhythm" src="https://marmooo.github.io/tip-tap-rhythm/favicon/favicon.svg" width="16" height="16">
+          Tip Tap Rhythm
+        </a></td>
+      </tr>
+      <tr><th>Classic</th>
+        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-notes/?${b}">
+          <img alt="Tip Tap Notes" src="https://marmooo.github.io/tip-tap-notes/favicon/favicon.svg" width="16" height="16">
+          Tip Tap Notes
+        </td></a>
+      </tr>
+      <tr><th>Classic</th>
+        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/doremi-piano/?${b}">
+          <img alt="Doremi Piano" src="https://marmooo.github.io/doremi-piano/favicon/favicon.svg" width="16" height="16">
+          Doremi Piano
+        </a></td>
+      </tr>
       <tr><th>TODO</th><td>Coming soon.</td></tr>
     </table>
   </div>
@@ -53,14 +78,39 @@ function loadConfig(){localStorage.getItem("darkMode")==1&&(document.documentEle
   <div>
     <h5>楽譜</h5>
     <table class="table table-sm table-striped w-auto">
-      <tr><th>Basic</th><td><a target="_blank" rel="noopener" href="https://marmooo.github.io/midi2abc/?${b}">midi2abc</a></td></tr>
-      <tr><th>Waterfall</th><td><a target="_blank" rel="noopener" href="https://marmooo.github.io/waterfall-piano/?${b}">Waterfall Piano</a></td></tr>
+      <tr><th>Basic</th>
+        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/midi2abc/?${b}">
+          <img alt="midi2abc" src="https://marmooo.github.io/midi2abc/favicon/favicon.svg" width="16" height="16">
+          midi2abc
+        </a></td>
+      </tr>
+      <tr><th>Waterfall</th>
+        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/waterfall-piano/?${b}">
+          <img alt="Waterfall Piano" src="https://marmooo.github.io/waterfall-piano/favicon/favicon.svg" width="16" height="16">
+          Waterfall Piano
+        </a></td>
+      </tr>
     </table>
     <h5 class="pt-3">ゲーム</h5>
     <table class="table table-sm table-striped w-auto">
-      <tr><th>Modern</th><td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-rhythm/?${b}">Tip Tap Rhythm</a></td></tr>
-      <tr><th>Classic</th><td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-notes/?${b}">Tip Tap Notes</a></td></tr>
-      <tr><th>Classic</th><td><a target="_blank" rel="noopener" href="https://marmooo.github.io/doremi-piano/?${b}">Doremi Piano</a></td></tr>
+      <tr><th>Modern</th>
+        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-rhythm/?${b}">
+          <img alt="Tip Tap Rhythm" src="https://marmooo.github.io/tip-tap-rhythm/favicon/favicon.svg" width="16" height="16">
+          Tip Tap Rhythm
+        </a></td>
+      </tr>
+      <tr><th>Classic</th>
+        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-notes/?${b}">
+          <img alt="Tip Tap Notes" src="https://marmooo.github.io/tip-tap-notes/favicon/favicon.svg" width="16" height="16">
+          Tip Tap Notes
+        </td></a>
+      </tr>
+      <tr><th>Classic</th>
+        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/doremi-piano/?${b}">
+          <img alt="Doremi Piano" src="https://marmooo.github.io/doremi-piano/favicon/favicon.svg" width="16" height="16">
+          Doremi Piano
+        </a></td>
+      </tr>
       <tr><th>TODO</th><td>Coming soon.</td></tr>
     </table>
   </div>

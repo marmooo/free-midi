@@ -723,7 +723,20 @@ function toLink(url, text) {
   return `<a href="${url}">${text}</a>`;
 }
 
-function toLicense(text) {
+function toWeb(filePath) {
+  const id = filePath.split("/")[0];
+  const collection = collections.get(id);
+  const url = collection.web;
+  const name = collection.name;
+  return `<a href="${url}">${name}</a>`;
+}
+
+function toLicense(text, filePath) {
+  if (!text) {
+    const id = filePath.split("/")[0];
+    const collection = collections.get(id);
+    text = collection.license;
+  }
   try {
     new URL(text);
     return toLink(text, "Custom");
@@ -765,8 +778,8 @@ function _detailFormatterEn(_index, row) {
   const midiURL = `${midiDB}/${row.file}`;
   const params = toURLSearchParams(row);
   const query = params.toString();
-  const license = toLicense(row.license);
-  const web = toLink(row.web, row.web);
+  const license = toLicense(row.license, row.file);
+  const web = toWeb(row.file);
   const download = toDownload(row.id, midiURL, "en");
   let instruments = "";
   row.instruments.split(", ").forEach((instrument) => {
@@ -831,7 +844,6 @@ function _detailFormatterEn(_index, row) {
     <table class="table table-sm table-striped w-auto">
       <tr><th>License</th><td>${toString(license)}</td></tr>
       <tr><th>Download</th><td>${download}</td></tr>
-      <tr><th>ID</th><td>${toString(row.id)}</td></tr>
       <tr><th>Maintainer</th><td>${toString(row.maintainer)}</td></tr>
       <tr><th>Email</th><td>${toString(row.email)}</td></tr>
       <tr><th>Web</th><td>${toString(web)}</td></tr>
@@ -854,8 +866,8 @@ function _detailFormatterJa(_index, row) {
   const midiURL = `${midiDB}/${row.file}`;
   const params = toURLSearchParams(row);
   const query = params.toString();
-  const license = toLicense(row.license);
-  const web = toLink(row.web, row.web);
+  const license = toLicense(row.license, row.file);
+  const web = toWeb(row.file);
   const download = toDownload(row.id, midiURL, "ja");
   let instruments = "";
   row.instruments.split(", ").forEach((instrument) => {
@@ -920,7 +932,6 @@ function _detailFormatterJa(_index, row) {
     <table class="table table-sm table-striped w-auto">
       <tr><th>ライセンス</th><td>${toString(license)}</td></tr>
       <tr><th>ダウンロード</th><td>${download}</td></tr>
-      <tr><th>id</th><td>${toString(row.id)}</td></tr>
       <tr><th>保守者</th><td>${toString(row.maintainer)}</td></tr>
       <tr><th>Email</th><td>${toString(row.email)}</td></tr>
       <tr><th>Web</th><td>${toString(web)}</td></tr>
@@ -1047,8 +1058,8 @@ function initFilterTexts() {
   return texts;
 }
 
-async function fetchCollectionList() {
-  const response = await fetch(`${midiDB}/list.json`);
+async function fetchCollections() {
+  const response = await fetch(`${midiDB}/collections.json`);
   return await response.json();
 }
 
@@ -1060,8 +1071,8 @@ function shuffle(array) {
   return array;
 }
 
-async function fetchPlayList(collectionList) {
-  const dirs = collectionList.map((collection) => collection.id);
+async function fetchPlayList(collections) {
+  const dirs = collections.map((collection) => collection.id);
   shuffle(dirs);
   const lang = document.documentElement.lang;
   const firstDir = dirs[0];
@@ -1105,9 +1116,11 @@ async function fetchPlayList(collectionList) {
 }
 
 loadConfig();
-const midiDB = "https://midi-db.pages.dev";
+// const midiDB = "https://midi-db.pages.dev";
+const midiDB = "/midi-db";
 const $table = $("#midiList");
 const filterTexts = initFilterTexts();
+const collections = new Map();
 let controllerDisabled;
 let currentTime = 0;
 let ns;
@@ -1119,8 +1132,11 @@ let player;
 const instrumentListPromise = loadInstrumentList();
 loadSoundFontList();
 initPlayer();
-fetchCollectionList().then((collectionList) => {
-  fetchPlayList(collectionList);
+fetchCollections().then((data) => {
+  data.forEach((datum) => {
+    collections.set(datum.id, datum);
+  });
+  fetchPlayList(data);
 });
 
 document.getElementById("toggleDarkMode").onclick = toggleDarkMode;

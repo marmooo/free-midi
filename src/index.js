@@ -248,7 +248,6 @@ function initPlayer() {
   player = new SoundFontPlayer(stopCallback);
 }
 
-
 function getPrograms(ns) {
   const programs = new Set();
   ns.notes.forEach((note) => programs.add(note.program));
@@ -1048,18 +1047,9 @@ function initFilterTexts() {
   return texts;
 }
 
-async function fetchHeaderPlayList() {
-  const lang = document.documentElement.lang;
-  const response = await fetch(`${midiDB}/${lang}0.json`);
-  const data = await response.json();
-  $table.bootstrapTable("load", data);
-  addFilterControl();
-  instrumentListPromise.then((list) => {
-    data.forEach((info) => {
-      info.instruments = getInstrumentsString(list, info);
-    });
-  });
-  fetchPlayList();
+async function fetchCollectionList() {
+  const response = await fetch(`${midiDB}/list.json`);
+  return await response.json();
 }
 
 function shuffle(array) {
@@ -1070,23 +1060,8 @@ function shuffle(array) {
   return array;
 }
 
-async function fetchPlayList() {
-  const dirs = [
-    "lilypond-songs",
-    "piano-midi.de",
-    "s-pst.info",
-    "music-abc",
-    "tunebook-abc",
-    "ABC_TuneBooks",
-    "mutopia",
-    "煉獄庭園",
-    "魔王魂",
-    "AmorKana",
-    "karugamo",
-    "デジファミ音楽堂",
-    "takumi.net",
-    "LittleMelody+",
-  ];
+async function fetchPlayList(collectionList) {
+  const dirs = collectionList.map((collection) => collection.id);
   shuffle(dirs);
   const lang = document.documentElement.lang;
   const firstDir = dirs[0];
@@ -1125,7 +1100,7 @@ async function fetchPlayList() {
           info.instruments = getInstrumentsString(list, info);
         });
       });
-    })
+    });
   });
 }
 
@@ -1144,7 +1119,9 @@ let player;
 const instrumentListPromise = loadInstrumentList();
 loadSoundFontList();
 initPlayer();
-fetchPlayList();
+fetchCollectionList().then((collectionList) => {
+  fetchPlayList(collectionList);
+});
 
 document.getElementById("toggleDarkMode").onclick = toggleDarkMode;
 document.getElementById("lang").onchange = changeLang;

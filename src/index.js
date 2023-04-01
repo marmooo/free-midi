@@ -1072,11 +1072,10 @@ function shuffle(array) {
 }
 
 async function fetchPlayList(collections) {
-  const dirs = collections.map((collection) => collection.id);
-  shuffle(dirs);
+  const ids = collections.map((collection) => collection.id);
+  shuffle(ids);
   const lang = document.documentElement.lang;
-  const firstDir = dirs[0];
-  const firstResponse = await fetch(`${midiDB}/json/${firstDir}/${lang}.json`);
+  const firstResponse = await fetch(`${midiDB}/json/${ids[0]}/${lang}.json`);
   const firstData = await firstResponse.json();
   $table.bootstrapTable("load", firstData);
   addFilterControl();
@@ -1086,7 +1085,7 @@ async function fetchPlayList(collections) {
     });
   });
 
-  const promises = dirs.slice(1).map(async (dir) => {
+  const promises = ids.slice(1).map(async (dir) => {
     const response = await fetch(`${midiDB}/json/${dir}/${lang}.json`);
     return response.json();
   });

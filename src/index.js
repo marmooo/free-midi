@@ -1123,7 +1123,7 @@ function addCollectionSelector() {
     button.onclick = () => {
       const input = document.getElementById("midiList")
         .querySelector("thead > tr > th[data-field='id'] input");
-      input.value = collection.id;
+      if (input) input.value = collection.id;
       filterTable("id", collection.id);
     };
     root.appendChild(button);

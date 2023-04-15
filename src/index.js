@@ -1118,7 +1118,11 @@ function addCollectionSelector() {
   const root = document.getElementById("collections");
   collections.forEach((collection) => {
     const button = document.createElement("button");
-    button.className = "btn btn-sm btn-outline-primary m-1";
+    if (collection.status == "CLOSED") {
+      button.className = "btn btn-sm btn-outline-secondary m-1";
+    } else {
+      button.className = "btn btn-sm btn-outline-primary m-1";
+    }
     button.textContent = collection.name;
     button.onclick = () => {
       const input = document.getElementById("midiList")

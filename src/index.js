@@ -1114,6 +1114,22 @@ async function fetchPlayList(collections) {
   });
 }
 
+function addCollectionSelector() {
+  const root = document.getElementById("collections");
+  collections.forEach((collection) => {
+    const button = document.createElement("button");
+    button.className = "btn btn-sm btn-outline-primary m-1";
+    button.textContent = collection.name;
+    button.onclick = () => {
+      const input = document.getElementById("midiList")
+        .querySelector("thead > tr > th[data-field='id'] input");
+      input.value = collection.id;
+      filterTable("id", collection.id);
+    };
+    root.appendChild(button);
+  });
+}
+
 loadConfig();
 const midiDB = "https://midi-db.pages.dev";
 const $table = $("#midiList");
@@ -1134,6 +1150,7 @@ fetchCollections().then((data) => {
   data.forEach((datum) => {
     collections.set(datum.id, datum);
   });
+  addCollectionSelector();
   fetchPlayList(data);
 });
 

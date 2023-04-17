@@ -952,13 +952,13 @@ function _detailFormatterJa(_index, row) {
 
 function _toolFormatterEn(_value, _row, _index) {
   return `
-<button title="play" class="btn p-0"><i class="bi bi-play-fill"></i></button>
+<button title="play" class="btn p-0" type="button"><i class="bi bi-play-fill"></i></button>
   `;
 }
 
 function _toolFormatterJa(_value, _row, _index) {
   return `
-<button title="再生" class="btn p-0"><i class="bi bi-play-fill"></i></button>
+<button title="再生" class="btn p-0" type="button"><i class="bi bi-play-fill"></i></button>
   `;
 }
 
@@ -1123,6 +1123,7 @@ function addCollectionSelector() {
     } else {
       button.className = "btn btn-sm btn-outline-primary m-1";
     }
+    button.type = "button";
     button.textContent = collection.name;
     button.onclick = () => {
       const input = document.getElementById("midiList")
@@ -1135,7 +1136,8 @@ function addCollectionSelector() {
 }
 
 loadConfig();
-const midiDB = "https://midi-db.pages.dev";
+// const midiDB = "https://midi-db.pages.dev";
+const midiDB = "/midi-db";
 const $table = $("#midiList");
 const filterTexts = initFilterTexts();
 const collections = new Map();

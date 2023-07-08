@@ -107,8 +107,24 @@ table.rc-table-resizing thead > th > a {
     <style>
       #speed { width:70px !important; }
       #midiList > tbody > tr > td { overflow: hidden; text-overflow: ellipsis; max-width: 250px; white-space: nowrap; }
-      html[data-theme="dark"] { filter: invert(1) hue-rotate(180deg); }
-      @-moz-document url-prefix() { html[data-theme="dark"] { background-color:black; } }
+      html[data-bs-theme="dark"] .navbar-brand > img { filter: invert(1) hue-rotate(180deg); }
+      html[data-bs-theme="dark"] .btn-light {
+        --bs-btn-color: #fff;
+        --bs-btn-bg: var(--bs-gray-800);
+        --bs-btn-border-color: var(--bs-gray-800);
+        --bs-btn-hover-color: #fff;
+        --bs-btn-hover-bg: var(--bs-gray-700);
+        --bs-btn-hover-border-color: var(--bs-gray-600);
+        --bs-btn-active-color: #fff;
+        --bs-btn-active-bg: var(--bs-gray-600);
+        --bs-btn-active-border-color: var(--bs-gray-500);
+        --bs-btn-disabled-color: #fff;
+        --bs-btn-disabled-bg: var(--bs-gray-800);
+        --bs-btn-disabled-border-color: var(--bs-gray-800);
+      }
+      html[data-bs-theme="dark"] #midiController i { filter: invert(1) hue-rotate(180deg); }
+      html[data-bs-theme="dark"] #midiList i { filter: invert(1) hue-rotate(180deg); }
+      html[data-bs-theme="dark"] #midiList img { filter: invert(1) hue-rotate(180deg); }
     </style>
     <script data-ad-client="ca-pub-6459713332128733" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
   </head>
@@ -117,7 +133,7 @@ table.rc-table-resizing thead > th > a {
       <nav class="navbar navbar-expand navbar-light">
         <div class="container flex-wrap">
           <a class="navbar-brand" href="/free-midi/">
-            <img alt="" src="/free-midi/favicon/favicon.svg" width="32" height="32">
+            <img alt="Free MIDI" src="/free-midi/favicon/favicon.svg" width="32" height="32">
             Free MIDI
           </a>
           <div class="navbar-nav">
@@ -135,14 +151,20 @@ table.rc-table-resizing thead > th > a {
     <main class="container">
       <p>Free MIDI Search for everyone. Free to listen, copy, play, etc.</p>
       <div id="controller" class="d-flex flex-wrap justify-content-between mb-2">
-        <div class="d-flex">
-          <div class="d-inline">
-            <button title="speed down" id="speedDown" class="btn btn-sm btn-light" type="button"><i class="bi bi-chevron-double-left"></i></button>
-            <input title="speed" id="speed" class="form-control form-control-sm d-inline w-auto text-center" type="number" min="0" step="10" value="100" placeholder="speed">
-            <button title="speed up" id="speedUp" class="btn btn-sm btn-light" type="button"><i class="bi bi-chevron-double-right"></i></button>
-          </div>
-          <button title="repeat" id="repeat" class="btn btn-sm btn-light" type="button"><i class="bi bi-repeat"></i></button>
-          <button title="volume ON/OFF" id="volumeOnOff" class="btn btn-sm btn-light" type="button"><i class="bi bi-volume-up-fill"></i></button>
+        <div id="midiController" class="d-flex">
+          <button title="speed down" id="speedDown" class="btn btn-sm btn-light" type="button">
+            <i class="bi bi-chevron-double-left"></i>
+          </button>
+          <input title="speed" id="speed" class="form-control form-control-sm d-inline w-auto text-center" type="number" min="0" step="10" value="100" placeholder="speed">
+          <button title="speed up" id="speedUp" class="btn btn-sm btn-light" type="button">
+            <i class="bi bi-chevron-double-right"></i>
+          </button>
+          <button title="repeat" id="repeat" class="btn btn-sm btn-light" type="button">
+            <i class="bi bi-repeat"></i>
+          </button>
+          <button title="volume ON/OFF" id="volumeOnOff" class="btn btn-sm btn-light" type="button">
+            <i class="bi bi-volume-up-fill"></i>
+          </button>
           <div class="d-flex align-items-center">
             <input type="range" id="volumebar" class="form-range" min="0" max="100" value="50" step="1">
           </div>
@@ -171,7 +193,7 @@ table.rc-table-resizing thead > th > a {
             data-detail-view="true"
             data-detail-formatter="_detailFormatterEn"
             data-detail-view-icon="true">
-          <thead class="table-light">
+          <thead>
             <tr>
               <th data-field="tool" data-formatter="_toolFormatterEn" data-events="toolEvents"></th>
               <th data-field="composer" data-sortable="true">Composer</th>

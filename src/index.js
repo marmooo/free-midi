@@ -746,8 +746,8 @@ function toLicense(text, filePath) {
   }
 }
 
-function toDownload(id, url, lang) {
-  if (id.startsWith("!")) {
+function toDownload(url, lang, redistribution) {
+  if (redistribution != undefined) {
     switch (lang) {
       case "ja":
         return "HP からダウンロードしてください。";
@@ -781,7 +781,9 @@ function _detailFormatterEn(_index, row) {
   const query = params.toString();
   const license = toLicense(row.license, row.file);
   const web = toWeb(row.file);
-  const download = toDownload(row.id, midiURL, "en");
+  const id = row.file.split("/")[0];
+  const redistribution = collections.get(id).redistribution;
+  const download = toDownload(midiURL, "en", redistribution);
   let instruments = "";
   row.instruments.split(", ").forEach((instrument) => {
     instruments += `<li>${instrument}</li>`;
@@ -869,7 +871,9 @@ function _detailFormatterJa(_index, row) {
   const query = params.toString();
   const license = toLicense(row.license, row.file);
   const web = toWeb(row.file);
-  const download = toDownload(row.id, midiURL, "ja");
+  const id = row.file.split("/")[0];
+  const redistribution = collections.get(id).redistribution;
+  const download = toDownload(midiURL, "ja", redistribution);
   let instruments = "";
   row.instruments.split(", ").forEach((instrument) => {
     instruments += `<li>${instrument}</li>`;
@@ -1072,12 +1076,28 @@ function shuffle(array) {
   return array;
 }
 
+function complementTable(info, data) {
+  const country = info.country;
+  const composer = info.composer;
+  const maintainer = info.maintainer;
+  const web = info.web;
+  const license = info.license;
+  data.forEach((datum) => {
+    if (!datum.country && country) datum.country = country;
+    if (!datum.composer && composer) datum.composer = composer;
+    if (!datum.maintainer && maintainer) datum.maintainer = maintainer;
+    if (!datum.web) datum.web = web;
+    if (!datum.license) datum.license = license;
+  });
+}
+
 async function fetchPlayList(collections) {
-  const ids = collections.map((collection) => collection.id);
-  shuffle(ids);
+  const infos = Array.from(collections.values());
+  shuffle(infos);
   const lang = document.documentElement.lang;
-  const firstResponse = await fetch(`${midiDB}/json/${ids[0]}/${lang}.json`);
+  const firstResponse = await fetch(`${midiDB}/json/${infos[0].id}/${lang}.json`);
   const firstData = await firstResponse.json();
+  complementTable(infos[0], firstData);
   $table.bootstrapTable("load", firstData);
   addFilterControl();
   instrumentListPromise.then((list) => {
@@ -1086,12 +1106,13 @@ async function fetchPlayList(collections) {
     });
   });
 
-  const promises = ids.slice(1).map(async (dir) => {
-    const response = await fetch(`${midiDB}/json/${dir}/${lang}.json`);
+  const promises = infos.slice(1).map(async (info) => {
+    const response = await fetch(`${midiDB}/json/${info.id}/${lang}.json`);
     return response.json();
   });
   Promise.all(promises).then((dataset) => {
-    dataset.forEach((data) => {
+    dataset.forEach((data, i) => {
+      complementTable(infos[i + 1], data);
       $table.bootstrapTable("append", data);
       addFilterControl();
       // TODO: column-switch.bs.table does not work
@@ -1128,9 +1149,9 @@ function addCollectionSelector() {
     button.textContent = collection.name;
     button.onclick = () => {
       const input = document.getElementById("midiList")
-        .querySelector("thead > tr > th[data-field='id'] input");
+        .querySelector("thead > tr > th[data-field='file'] input");
       if (input) input.value = collection.id;
-      filterTable("id", collection.id);
+      filterTable("file", collection.id);
     };
     root.appendChild(button);
   });

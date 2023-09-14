@@ -1135,6 +1135,7 @@ async function fetchPlayList(collections) {
         "filterAlgorithm": () => true,
       });
       filteredInstrumentNode.classList.remove("checked");
+      filteredCollectionNode.classList.remove("checked");
     });
   });
 }
@@ -1151,10 +1152,19 @@ function addCollectionSelector() {
     button.type = "button";
     button.textContent = collection.name;
     button.onclick = () => {
+      let collectionId = collection.id;
+      if (filteredCollectionNode == button) {
+        button.classList.remove("checked");
+        collectionId = "";
+      } else {
+        button.classList.add("checked");
+        if (filteredCollectionNode) filteredCollectionNode.classList.remove("checked");
+      }
       const input = document.getElementById("midiList")
         .querySelector("thead > tr > th[data-field='file'] input");
-      if (input) input.value = collection.id;
-      filterTable("file", collection.id);
+      if (input) input.value = collectionId;
+      filterTable("file", collectionId);
+      filteredCollectionNode = button;
     };
     root.appendChild(button);
   });
@@ -1220,6 +1230,7 @@ let configChanged = false;
 let timer;
 let player;
 let filteredInstrumentNode;
+let filteredCollectionNode;
 
 setFilterInstrumentsButtons();
 const instrumentListPromise = loadInstrumentList();

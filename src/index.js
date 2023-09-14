@@ -1095,7 +1095,9 @@ async function fetchPlayList(collections) {
   const infos = Array.from(collections.values());
   shuffle(infos);
   const lang = document.documentElement.lang;
-  const firstResponse = await fetch(`${midiDB}/json/${infos[0].id}/${lang}.json`);
+  const firstResponse = await fetch(
+    `${midiDB}/json/${infos[0].id}/${lang}.json`,
+  );
   const firstData = await firstResponse.json();
   complementTable(infos[0], firstData);
   $table.bootstrapTable("load", firstData);
@@ -1115,23 +1117,24 @@ async function fetchPlayList(collections) {
       complementTable(infos[i + 1], data);
       $table.bootstrapTable("append", data);
       addFilterControl();
-      // TODO: column-switch.bs.table does not work
-      const toolbar = document.querySelector(".buttons-toolbar");
-      [...toolbar.querySelectorAll("input")].forEach((input) => {
-        input.addEventListener("change", addFilterControl);
-      });
-      // TODO: data-show-search-clear-button doew not work
-      const searchClearButton = toolbar.children[1].querySelector("button");
-      searchClearButton.addEventListener("click", () => {
-        $table.bootstrapTable("filterBy", {}, {
-          "filterAlgorithm": () => true,
-        });
-      });
       instrumentListPromise.then((list) => {
         data.forEach((info) => {
           info.instruments = getInstrumentsString(list, info);
         });
       });
+    });
+    // TODO: column-switch.bs.table does not work
+    const toolbar = document.querySelector(".buttons-toolbar");
+    [...toolbar.querySelectorAll("input")].forEach((input) => {
+      input.addEventListener("change", addFilterControl);
+    });
+    // TODO: data-show-search-clear-button doew not work
+    const searchClearButton = toolbar.children[1].querySelector("button");
+    searchClearButton.addEventListener("click", () => {
+      $table.bootstrapTable("filterBy", {}, {
+        "filterAlgorithm": () => true,
+      });
+      filteredInstrumentNode.classList.remove("checked");
     });
   });
 }
@@ -1171,6 +1174,39 @@ function loadLibraries(urls) {
   return Promise.all(promises);
 }
 
+function setFilterInstrumentsButtons() {
+  const lang = document.documentElement.lang;
+  const instruments = (lang == "en")
+    ? ["Piano", "Accordion", "Violin", "Guitar", "Trumpet", "Sax"]
+    : [
+      "ピアノ",
+      "アコーディオン",
+      "ヴァイオリン",
+      "ギター",
+      "トランペット",
+      "サックス",
+    ];
+  const input = document.getElementById("midiList")
+    .querySelector("thead > tr > th[data-field='instruments'] input");
+  const buttons = document.getElementById("filterInstruments")
+    .getElementsByTagName("button");
+  [...buttons].forEach((button, i) => {
+    button.onclick = () => {
+      let instrument = instruments[i];
+      if (filteredInstrumentNode == button) {
+        button.classList.remove("checked");
+        instrument = "";
+      } else {
+        button.classList.add("checked");
+        if (filteredInstrumentNode) filteredInstrumentNode.classList.remove("checked");
+      }
+      if (input) input.value = instrument;
+      filterTable("instruments", instrument);
+      filteredInstrumentNode = button;
+    };
+  });
+}
+
 loadConfig();
 const midiDB = "https://midi-db.pages.dev";
 const $table = $("#midiList");
@@ -1183,7 +1219,9 @@ let nsCache;
 let configChanged = false;
 let timer;
 let player;
+let filteredInstrumentNode;
 
+setFilterInstrumentsButtons();
 const instrumentListPromise = loadInstrumentList();
 fetchCollections().then((data) => {
   data.forEach((datum) => {

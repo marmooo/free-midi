@@ -980,7 +980,7 @@ function play(node, row) {
   [...prevNodes].forEach((prevNode) => {
     prevNode.className = "bi bi-play-fill";
   });
-  if (player.isPlaying()) player.stop();
+  if (player.isPlaying()) player.stop(true);
   node.className = "bi bi-pause-fill";
   const url = `${midiDB}/${row.file}`;
   loadMIDI(url).then(() => {
@@ -1220,7 +1220,8 @@ function setFilterInstrumentsButtons() {
 }
 
 loadConfig();
-const midiDB = "https://midi-db.pages.dev";
+// const midiDB = "https://midi-db.pages.dev";
+const midiDB = "/midi-db";
 const $table = $("#midiList");
 const filterTexts = initFilterTexts();
 const collections = new Map();

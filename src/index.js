@@ -517,27 +517,29 @@ function playNext() {
   const tr = pauseNode.parentNode.parentNode.parentNode;
   const index = [...tbody.children].indexOf(tr);
   pauseNode.className = "bi bi-play-fill";
-  const pageData = $table.bootstrapTable("getData", { useCurrentPage: true });
-  if ((index + 1) % pageData.length == 0) {
+  const currPageData = $table.bootstrapTable("getData", { useCurrentPage: true });
+  if (index + 1 == currPageData.length) {
     const data = $table.bootstrapTable("getData");
-    if (data.at(-1) == pageData.at(-1)) {
+    if (data.at(-1) == currPageData.at(-1)) {
       const repeatObj = document.getElementById("repeat");
       const repeat = repeatObj.classList.contains("active");
       if (repeat) {
         $table.bootstrapTable("selectPage", 1);
+        const pageData = $table.bootstrapTable("getData", { useCurrentPage: true });
         const tbody = $table[0].querySelector("tbody");
         const nextNode = tbody.querySelector(".bi-play-fill");
-        if (nextNode) nextNode.click();
+        if (nextNode) play(nextNode, pageData[0]);
       }
     } else {
       $table.bootstrapTable("nextPage");
+      const pageData = $table.bootstrapTable("getData", { useCurrentPage: true });
       const tbody = $table[0].querySelector("tbody");
       const nextNode = tbody.querySelector(".bi-play-fill");
-      if (nextNode) nextNode.click();
+      if (nextNode) play(nextNode, pageData[0]);
     }
   } else {
     const nextNode = tr.nextElementSibling.querySelector(".bi-play-fill");
-    if (nextNode) nextNode.click();
+    if (nextNode) play(nextNode, currPageData[index + 1]);
   }
 }
 

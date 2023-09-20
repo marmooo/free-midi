@@ -165,9 +165,7 @@ class SoundFontPlayer {
 
   stop(noCallback) {
     if (noCallback) this.noCallback = true;
-    if (this.isPlaying()) {
-      this.synth.stopPlayer();
-    }
+    if (this.synth) this.synth.stopPlayer();
   }
 
   pause() {
@@ -982,7 +980,7 @@ function play(node, row) {
   [...prevNodes].forEach((prevNode) => {
     prevNode.className = "bi bi-play-fill";
   });
-  if (player.isPlaying()) player.stop(true);
+  player.stop(true);
   node.className = "bi bi-pause-fill";
   const url = `${midiDB}/${row.file}`;
   loadMIDI(url).then(() => {

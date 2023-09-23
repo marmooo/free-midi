@@ -447,9 +447,6 @@ function convertGM(ns) {
   ns.controlChanges = ns.controlChanges.filter((n) =>
     n.controlNumber == 0 || n.controlNumber == 32
   );
-  ns.notes.forEach((n) => {
-    if (!n.isDrum) n.program = 0;
-  });
 }
 
 async function loadMIDI(url) {

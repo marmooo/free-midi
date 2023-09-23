@@ -443,9 +443,20 @@ function initSeekbar(ns, seconds) {
   document.getElementById("currentTime").textContent = formatTime(seconds);
 }
 
+function convertGM(ns) {
+  ns.controlChanges = ns.controlChanges.filter((n) =>
+    n.controlNumber == 0 || n.controlNumber == 32
+  );
+  ns.notes.forEach((n) => {
+    if (!n.isDrum) n.program = 0;
+  });
+}
+
 async function loadMIDI(url) {
-  const waitTime = 0.2;
   ns = await core.urlToNoteSequence(url);
+  convertGM(ns);
+
+  const waitTime = 0.2;
   ns.totalTime += waitTime;
   ns.notes.forEach((note) => {
     note.startTime += waitTime;
@@ -515,7 +526,9 @@ function playNext() {
   const tr = pauseNode.parentNode.parentNode.parentNode;
   const index = [...tbody.children].indexOf(tr);
   pauseNode.className = "bi bi-play-fill";
-  const currPageData = $table.bootstrapTable("getData", { useCurrentPage: true });
+  const currPageData = $table.bootstrapTable("getData", {
+    useCurrentPage: true,
+  });
   if (index + 1 == currPageData.length) {
     const data = $table.bootstrapTable("getData");
     if (data.at(-1) == currPageData.at(-1)) {
@@ -523,14 +536,18 @@ function playNext() {
       const repeat = repeatObj.classList.contains("active");
       if (repeat) {
         $table.bootstrapTable("selectPage", 1);
-        const pageData = $table.bootstrapTable("getData", { useCurrentPage: true });
+        const pageData = $table.bootstrapTable("getData", {
+          useCurrentPage: true,
+        });
         const tbody = $table[0].querySelector("tbody");
         const nextNode = tbody.querySelector(".bi-play-fill");
         if (nextNode) play(nextNode, pageData[0]);
       }
     } else {
       $table.bootstrapTable("nextPage");
-      const pageData = $table.bootstrapTable("getData", { useCurrentPage: true });
+      const pageData = $table.bootstrapTable("getData", {
+        useCurrentPage: true,
+      });
       const tbody = $table[0].querySelector("tbody");
       const nextNode = tbody.querySelector(".bi-play-fill");
       if (nextNode) play(nextNode, pageData[0]);
@@ -1160,7 +1177,9 @@ function addCollectionSelector() {
         collectionId = "";
       } else {
         button.classList.add("checked");
-        if (filteredCollectionNode) filteredCollectionNode.classList.remove("checked");
+        if (filteredCollectionNode) {
+          filteredCollectionNode.classList.remove("checked");
+        }
       }
       const input = document.getElementById("midiList")
         .querySelector("thead > tr > th[data-field='file'] input");
@@ -1210,7 +1229,9 @@ function setFilterInstrumentsButtons() {
         instrument = "";
       } else {
         button.classList.add("checked");
-        if (filteredInstrumentNode) filteredInstrumentNode.classList.remove("checked");
+        if (filteredInstrumentNode) {
+          filteredInstrumentNode.classList.remove("checked");
+        }
       }
       if (input) input.value = instrument;
       filterTable("instruments", instrument);

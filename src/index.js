@@ -994,7 +994,8 @@ function play(node, row) {
   [...prevNodes].forEach((prevNode) => {
     prevNode.className = "bi bi-play-fill";
   });
-  if (player && player.synth) player.stop(true);
+  if (!player || player.synth) return;
+  player.stop(true);
   node.className = "bi bi-pause-fill";
   const url = `${midiDB}/${row.file}`;
   loadMIDI(url).then(() => {

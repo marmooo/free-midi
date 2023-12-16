@@ -1124,6 +1124,7 @@ async function fetchPlayList(collections) {
       info.instruments = getInstrumentsString(list, info);
     });
   });
+  document.getElementById("midiList").style.height = "auto";
 
   const promises = infos.slice(1).map(async (info) => {
     const response = await fetch(`${midiDB}/json/${info.id}/${lang}.json`);

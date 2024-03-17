@@ -73,7 +73,7 @@ function changeLang() {
 
 class SoundFontPlayer {
   constructor(stopCallback) {
-    this.context = new AudioContext();
+    this.context = new globalThis.AudioContext();
     this.state = "stopped";
     this.noCallback = false;
     this.stopCallback = stopCallback;
@@ -1032,7 +1032,7 @@ function pause(node) {
   clearInterval(timer);
 }
 
-window.toolEvents = {
+globalThis.toolEvents = {
   "click .bi-play-fill": function (e, _value, row, _index) {
     switch (e.target.className) {
       case "bi bi-play-fill":

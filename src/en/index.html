@@ -144,7 +144,7 @@
             data-resizable="true"
             data-buttons-toolbar=".buttons-toolbar"
             data-detail-view="true"
-            data-detail-formatter="_detailFormatterEn"
+            data-detail-formatter="_detailFormatter"
             data-detail-view-icon="true">
           <thead>
             <tr>
@@ -315,6 +315,80 @@
       </div>
       <div class="text-muted">&copy; <a href="https://github.com/marmooo">marmooo</a></div>
     </footer>
+    <template id="detail-box">
+      <div class="d-flex overflow-scroll bg-info-subtle p-2">
+        <div class="basicInfo p-2">
+          <h5>Score</h5>
+          <table class="table table-sm table-striped w-auto">
+            <tr><th>Basic</th>
+              <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/midi2abc/">
+                <img class="favicon" alt="midi2abc" src="https://marmooo.github.io/midi2abc/favicon/favicon.svg" width="16" height="16">
+                midi2abc
+              </a></td>
+            </tr>
+            <tr><th>Waterfall</th>
+              <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/waterfall-piano/">
+                <img class="favicon" alt="Waterfall Piano" src="https://marmooo.github.io/waterfall-piano/favicon/favicon.svg" width="16" height="16">
+                Waterfall Piano
+              </a></td>
+            </tr>
+          </table>
+          <h5 class="pt-3">Game</h5>
+          <table class="table table-sm table-striped w-auto">
+            <tr><th>Modern</th>
+              <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-rhythm/">
+                <img class="favicon" alt="Tip Tap Rhythm" src="https://marmooo.github.io/tip-tap-rhythm/favicon/favicon.svg" width="16" height="16">
+                Tip Tap Rhythm
+              </a></td>
+            </tr>
+            <tr><th>Classic</th>
+              <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-notes/">
+                <img class="favicon" alt="Tip Tap Notes" src="https://marmooo.github.io/tip-tap-notes/favicon/favicon.svg" width="16" height="16">
+                Tip Tap Notes
+              </td></a>
+            </tr>
+            <tr><th>Classic</th>
+              <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/doremi-piano/">
+                <img class="favicon" alt="Doremi Piano" src="https://marmooo.github.io/doremi-piano/favicon/favicon.svg" width="16" height="16">
+                Doremi Piano
+              </a></td>
+            </tr>
+          </table>
+        </div>
+        <div class="musicInfo p-2">
+          <h5>Music Info</h5>
+          <table class="table table-sm table-striped w-auto">
+            <tr><th>Title</th><td></td></tr>
+            <tr><th>Composer</th><td></td></tr>
+            <tr><th>Opus</th><td></td></tr>
+            <tr><th>Lyricist</th><td></td></tr>
+            <tr><th>Date</th><td></td></tr>
+            <tr><th>Style</th><td></td></tr>
+            <tr><th>Arranger</th><td></td></tr>
+            <tr><th>Source</th><td></td></tr>
+          </table>
+        </div>
+        <div class="fileInfo p-2">
+          <h5>File Info</h5>
+          <table class="table table-sm table-striped w-auto">
+            <tr><th>License</th><td></td></tr>
+            <tr><th>Download</th><td></td></tr>
+            <tr><th>Maintainer</th><td></td></tr>
+            <tr><th>Email</th><td></td></tr>
+            <tr><th>Web</th><td></td></tr>
+          </table>
+        </div>
+        <div class="annotationInfo p-2">
+          <h5>Annotation Info</h5>
+          <table class="table table-sm table-striped w-auto">
+            <tr><th>Time</th><td></td></tr>
+            <tr><th>Difficulty</th><td></td></tr>
+            <tr><th>BPM</th><td></td></tr>
+            <tr><th>Instruments</th><td></td></tr>
+          </table>
+        </div>
+      </div>
+    </template>
     <div class="drop-inline-css
       page-item active
       dropdown-toggle show

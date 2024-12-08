@@ -787,182 +787,49 @@ function toURLSearchParams(row) {
   return params;
 }
 
-function _detailFormatterEn(_index, row) {
+function _detailFormatter(_index, row) {
+  const template = document.getElementById("detail-box")
+    .content.cloneNode(true);
+  const div = template.firstElementChild;
   const midiURL = `${midiDB}/${row.file}`;
   const params = toURLSearchParams(row);
   const query = params.toString();
+  for (const a of div.querySelectorAll(".basicInfo a")) {
+    a.href += `?${query}`;
+  }
+
+  const musicInfoTds = div.querySelectorAll(".musicInfo td");
+  musicInfoTds[0].textContent = toString(row.title);
+  musicInfoTds[1].textContent = toString(row.composer);
+  musicInfoTds[2].textContent = toString(row.opus);
+  musicInfoTds[3].textContent = toString(row.lyricist);
+  musicInfoTds[4].textContent = toString(row.date);
+  musicInfoTds[5].textContent = toString(row.style);
+  musicInfoTds[6].textContent = toString(row.arranger);
+  musicInfoTds[7].textContent = toString(row.source);
+
   const license = toLicense(row.license, row.file);
   const web = toWeb(row.file);
   const id = row.file.split("/")[0];
   const redistribution = collections.get(id).redistribution;
   const download = toDownload(midiURL, "en", redistribution);
-  let instruments = "";
-  row.instruments.split(", ").forEach((instrument) => {
-    instruments += `<li>${instrument}</li>`;
-  });
-  return `
-<div class="d-flex overflow-scroll bg-info-subtle p-2">
-  <div class="p-2">
-    <h5>Score</h5>
-    <table class="table table-sm table-striped w-auto">
-      <tr><th>Basic</th>
-        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/midi2abc/?${query}">
-          <img class="favicon" alt="midi2abc" src="https://marmooo.github.io/midi2abc/favicon/favicon.svg" width="16" height="16">
-          midi2abc
-        </a></td>
-      </tr>
-      <tr><th>Waterfall</th>
-        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/waterfall-piano/?${query}">
-          <img class="favicon" alt="Waterfall Piano" src="https://marmooo.github.io/waterfall-piano/favicon/favicon.svg" width="16" height="16">
-          Waterfall Piano
-        </a></td>
-      </tr>
-    </table>
-    <h5 class="pt-3">Game</h5>
-    <table class="table table-sm table-striped w-auto">
-      <tr><th>Modern</th>
-        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-rhythm/?${query}">
-          <img class="favicon" alt="Tip Tap Rhythm" src="https://marmooo.github.io/tip-tap-rhythm/favicon/favicon.svg" width="16" height="16">
-          Tip Tap Rhythm
-        </a></td>
-      </tr>
-      <tr><th>Classic</th>
-        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-notes/?${query}">
-          <img class="favicon" alt="Tip Tap Notes" src="https://marmooo.github.io/tip-tap-notes/favicon/favicon.svg" width="16" height="16">
-          Tip Tap Notes
-        </td></a>
-      </tr>
-      <tr><th>Classic</th>
-        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/doremi-piano/?${query}">
-          <img class="favicon" alt="Doremi Piano" src="https://marmooo.github.io/doremi-piano/favicon/favicon.svg" width="16" height="16">
-          Doremi Piano
-        </a></td>
-      </tr>
-    </table>
-  </div>
-  <div class="p-2">
-    <h5>Music Info</h5>
-    <table class="table table-sm table-striped w-auto">
-      <tr><th>Title</th><td>${toString(row.title)}</td></tr>
-      <tr><th>Composer</th><td>${toString(row.composer)}</td></tr>
-      <tr><th>Opus</th><td>${toString(row.opus)}</td></tr>
-      <tr><th>Lyricist</th><td>${toString(row.lyricist)}</td></tr>
-      <tr><th>Date</th><td>${toString(row.date)}</td></tr>
-      <tr><th>Style</th><td>${toString(row.style)}</td></tr>
-      <tr><th>Arranger</th><td>${toString(row.arranger)}</td></tr>
-      <tr><th>Source</th><td>${toString(row.source)}</td></tr>
-    </table>
-  </div>
-  <div class="p-2">
-    <h5>File Info</h5>
-    <table class="table table-sm table-striped w-auto">
-      <tr><th>License</th><td>${toString(license)}</td></tr>
-      <tr><th>Download</th><td>${download}</td></tr>
-      <tr><th>Maintainer</th><td>${toString(row.maintainer)}</td></tr>
-      <tr><th>Email</th><td>${toString(row.email)}</td></tr>
-      <tr><th>Web</th><td>${toString(web)}</td></tr>
-    </table>
-  </div>
-  <div class="p-2">
-    <h5>Annotation Info</h5>
-    <table class="table table-sm table-striped w-auto">
-      <tr><th>Time</th><td>${row.time}</td></tr>
-      <tr><th>Difficulty</th><td>${row.difficulty}</td></tr>
-      <tr><th>BPM</th><td>${row.bpm}</td></tr>
-      <tr><th>Instruments</th><td><ul>${instruments}</ul></td></tr>
-    </table>
-  </div>
-</div>
-  `;
-}
+  const fileInfoTds = div.querySelectorAll(".fileInfo td");
+  fileInfoTds[0].innerHTML = license;
+  fileInfoTds[1].innerHTML = download;
+  fileInfoTds[2].textContent = toString(row.maintainer);
+  fileInfoTds[3].textContent = toString(row.email);
+  fileInfoTds[4].innerHTML = web;
 
-function _detailFormatterJa(_index, row) {
-  const midiURL = `${midiDB}/${row.file}`;
-  const params = toURLSearchParams(row);
-  const query = params.toString();
-  const license = toLicense(row.license, row.file);
-  const web = toWeb(row.file);
-  const id = row.file.split("/")[0];
-  const redistribution = collections.get(id).redistribution;
-  const download = toDownload(midiURL, "ja", redistribution);
   let instruments = "";
   row.instruments.split(", ").forEach((instrument) => {
     instruments += `<li>${instrument}</li>`;
   });
-  return `
-<div class="d-flex overflow-scroll bg-info-subtle p-2">
-  <div class="p-2">
-    <h5>楽譜</h5>
-    <table class="table table-sm table-striped w-auto">
-      <tr><th>Basic</th>
-        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/midi2abc/?${query}">
-          <img class="favicon" alt="midi2abc" src="https://marmooo.github.io/midi2abc/favicon/favicon.svg" width="16" height="16">
-          midi2abc
-        </a></td>
-      </tr>
-      <tr><th>Waterfall</th>
-        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/waterfall-piano/?${query}">
-          <img class="favicon" alt="Waterfall Piano" src="https://marmooo.github.io/waterfall-piano/favicon/favicon.svg" width="16" height="16">
-          Waterfall Piano
-        </a></td>
-      </tr>
-    </table>
-    <h5 class="pt-3">ゲーム</h5>
-    <table class="table table-sm table-striped w-auto">
-      <tr><th>Modern</th>
-        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-rhythm/?${query}">
-          <img class="favicon" alt="Tip Tap Rhythm" src="https://marmooo.github.io/tip-tap-rhythm/favicon/favicon.svg" width="16" height="16">
-          Tip Tap Rhythm
-        </a></td>
-      </tr>
-      <tr><th>Classic</th>
-        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/tip-tap-notes/?${query}">
-          <img class="favicon" alt="Tip Tap Notes" src="https://marmooo.github.io/tip-tap-notes/favicon/favicon.svg" width="16" height="16">
-          Tip Tap Notes
-        </td></a>
-      </tr>
-      <tr><th>Classic</th>
-        <td><a target="_blank" rel="noopener" href="https://marmooo.github.io/doremi-piano/?${query}">
-          <img class="favicon" alt="Doremi Piano" src="https://marmooo.github.io/doremi-piano/favicon/favicon.svg" width="16" height="16">
-          Doremi Piano
-        </a></td>
-      </tr>
-    </table>
-  </div>
-  <div class="p-2">
-    <h5>音楽情報</h5>
-    <table class="table table-sm table-striped w-auto">
-      <tr><th>タイトル</th><td>${toString(row.title)}</td></tr>
-      <tr><th>作曲者</th><td>${toString(row.composer)}</td></tr>
-      <tr><th>作品</th><td>${toString(row.opus)}</td></tr>
-      <tr><th>作詞者</th><td>${toString(row.lyricist)}</td></tr>
-      <tr><th>日付</th><td>${toString(row.date)}</td></tr>
-      <tr><th>スタイル</th><td>${toString(row.style)}</td></tr>
-      <tr><th>編曲者</th><td>${toString(row.arranger)}</td></tr>
-      <tr><th>ソース</th><td>${toString(row.source)}</td></tr>
-    </table>
-  </div>
-  <div class="p-2">
-    <h5>ファイル情報</h5>
-    <table class="table table-sm table-striped w-auto">
-      <tr><th>ライセンス</th><td>${toString(license)}</td></tr>
-      <tr><th>ダウンロード</th><td>${download}</td></tr>
-      <tr><th>保守者</th><td>${toString(row.maintainer)}</td></tr>
-      <tr><th>Email</th><td>${toString(row.email)}</td></tr>
-      <tr><th>Web</th><td>${toString(web)}</td></tr>
-    </table>
-  </div>
-  <div class="p-2">
-    <h5>注釈情報</h5>
-    <table class="table table-sm table-striped w-auto">
-      <tr><th>時間</th><td>${row.time}</td></tr>
-      <tr><th>難易度</th><td>${row.difficulty}</td></tr>
-      <tr><th>BPM</th><td>${row.bpm}</td></tr>
-      <tr><th>Instruments</th><td><ul>${instruments}</ul></td></tr>
-    </table>
-  </div>
-</div>
-  `;
+  const annotationInfoTds = div.querySelectorAll(".annotationInfo td");
+  annotationInfoTds[0].textContent = row.time;
+  annotationInfoTds[1].textContent = row.difficulty;
+  annotationInfoTds[2].textContent = row.bpm;
+  annotationInfoTds[3].innerHTML = `<ul>${instruments}</ul>`;
+  return div;
 }
 
 function _toolFormatterEn(_value, _row, _index) {

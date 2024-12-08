@@ -927,7 +927,6 @@ function _detailFormatterJa(_index, row) {
           Doremi Piano
         </a></td>
       </tr>
-      <tr><th>TODO</th><td>Coming soon.</td></tr>
     </table>
   </div>
   <div class="p-2">

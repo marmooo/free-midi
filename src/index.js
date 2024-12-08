@@ -801,8 +801,8 @@ function _detailFormatterEn(_index, row) {
     instruments += `<li>${instrument}</li>`;
   });
   return `
-<div class="d-flex overflow-scroll p-2">
-  <div>
+<div class="d-flex overflow-scroll bg-info-subtle p-2">
+  <div class="p-2">
     <h5>Score</h5>
     <table class="table table-sm table-striped w-auto">
       <tr><th>Basic</th>
@@ -838,10 +838,9 @@ function _detailFormatterEn(_index, row) {
           Doremi Piano
         </a></td>
       </tr>
-      <tr><th>TODO</th><td>Coming soon.</td></tr>
     </table>
   </div>
-  <div>
+  <div class="p-2">
     <h5>Music Info</h5>
     <table class="table table-sm table-striped w-auto">
       <tr><th>Title</th><td>${toString(row.title)}</td></tr>
@@ -854,7 +853,7 @@ function _detailFormatterEn(_index, row) {
       <tr><th>Source</th><td>${toString(row.source)}</td></tr>
     </table>
   </div>
-  <div>
+  <div class="p-2">
     <h5>File Info</h5>
     <table class="table table-sm table-striped w-auto">
       <tr><th>License</th><td>${toString(license)}</td></tr>
@@ -864,7 +863,7 @@ function _detailFormatterEn(_index, row) {
       <tr><th>Web</th><td>${toString(web)}</td></tr>
     </table>
   </div>
-  <div>
+  <div class="p-2">
     <h5>Annotation Info</h5>
     <table class="table table-sm table-striped w-auto">
       <tr><th>Time</th><td>${row.time}</td></tr>

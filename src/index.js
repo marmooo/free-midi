@@ -566,38 +566,34 @@ function setNoteInstruments(ns) {
   }
 }
 
-function loadSoundFontList() {
-  return fetch("https://soundfonts.pages.dev/list.json")
-    .then((response) => response.json())
-    .then((data) => {
-      const soundfonts = document.getElementById("soundfonts");
-      data.forEach((info) => {
-        const option = document.createElement("option");
-        option.textContent = info.name;
-        if (info.name == "GeneralUser_GS_v1.471") {
-          option.selected = true;
-        }
-        soundfonts.appendChild(option);
-      });
-    });
+async function loadSoundFontList() {
+  const response = await fetch("https://soundfonts.pages.dev/list.json");
+  const data = await response.json();
+  const soundfonts = document.getElementById("soundfonts");
+  data.forEach((info) => {
+    const option = document.createElement("option");
+    option.textContent = info.name;
+    if (info.name == "GeneralUser_GS_v1.471") {
+      option.selected = true;
+    }
+    soundfonts.appendChild(option);
+  });
 }
 
-function loadInstrumentList() {
+async function loadInstrumentList() {
   const langObj = document.getElementById("lang");
   const lang = langObj.options[langObj.selectedIndex].value;
   const instruments = document.getElementById("instruments");
-  return fetch(`/free-midi/${lang}/instruments.lst`)
-    .then((response) => response.text())
-    .then((text) => {
-      const list = [];
-      text.trimEnd().split("\n").forEach((line) => {
-        const option = document.createElement("option");
-        option.textContent = line;
-        instruments.appendChild(option);
-        list.push(line);
-      });
-      return list;
-    });
+  const response = await fetch(`/free-midi/${lang}/instruments.lst`);
+  const text = await response.text();
+  const list = [];
+  text.trimEnd().split("\n").forEach((line) => {
+    const option = document.createElement("option");
+    option.textContent = line;
+    instruments.appendChild(option);
+    list.push(line);
+  });
+  return list;
 }
 
 async function changeConfig() {
@@ -1112,6 +1108,7 @@ async function fetchPlayList(collections) {
   const infos = Array.from(collections.values());
   shuffle(infos);
   const lang = document.documentElement.lang;
+  const instrumentList = await loadInstrumentList();
   const firstResponse = await fetch(
     `${midiDB}/json/${infos[0].id}/${lang}.json`,
   );
@@ -1119,10 +1116,8 @@ async function fetchPlayList(collections) {
   complementTable(infos[0], firstData);
   $table.bootstrapTable("load", firstData);
   addFilterControl();
-  instrumentListPromise.then((list) => {
-    firstData.forEach((info) => {
-      info.instruments = getInstrumentsString(list, info);
-    });
+  firstData.forEach((info) => {
+    info.instruments = getInstrumentsString(instrumentList, info);
   });
   document.getElementById("midiList").style.height = "auto";
 
@@ -1135,10 +1130,8 @@ async function fetchPlayList(collections) {
       complementTable(infos[i + 1], data);
       $table.bootstrapTable("append", data);
       addFilterControl();
-      instrumentListPromise.then((list) => {
-        data.forEach((info) => {
-          info.instruments = getInstrumentsString(list, info);
-        });
+      data.forEach((info) => {
+        info.instruments = getInstrumentsString(instrumentList, info);
       });
     });
     // TODO: column-switch.bs.table does not work
@@ -1255,7 +1248,6 @@ let filteredInstrumentNode;
 let filteredCollectionNode;
 
 setFilterInstrumentsButtons();
-const instrumentListPromise = loadInstrumentList();
 fetchCollections().then((data) => {
   data.forEach((datum) => {
     collections.set(datum.id, datum);

@@ -890,8 +890,8 @@ function _detailFormatterJa(_index, row) {
     instruments += `<li>${instrument}</li>`;
   });
   return `
-<div class="d-flex overflow-scroll p-2">
-  <div>
+<div class="d-flex overflow-scroll bg-info-subtle p-2">
+  <div class="p-2">
     <h5>楽譜</h5>
     <table class="table table-sm table-striped w-auto">
       <tr><th>Basic</th>
@@ -930,7 +930,7 @@ function _detailFormatterJa(_index, row) {
       <tr><th>TODO</th><td>Coming soon.</td></tr>
     </table>
   </div>
-  <div>
+  <div class="p-2">
     <h5>音楽情報</h5>
     <table class="table table-sm table-striped w-auto">
       <tr><th>タイトル</th><td>${toString(row.title)}</td></tr>
@@ -943,7 +943,7 @@ function _detailFormatterJa(_index, row) {
       <tr><th>ソース</th><td>${toString(row.source)}</td></tr>
     </table>
   </div>
-  <div>
+  <div class="p-2">
     <h5>ファイル情報</h5>
     <table class="table table-sm table-striped w-auto">
       <tr><th>ライセンス</th><td>${toString(license)}</td></tr>
@@ -953,7 +953,7 @@ function _detailFormatterJa(_index, row) {
       <tr><th>Web</th><td>${toString(web)}</td></tr>
     </table>
   </div>
-  <div>
+  <div class="p-2">
     <h5>注釈情報</h5>
     <table class="table table-sm table-striped w-auto">
       <tr><th>時間</th><td>${row.time}</td></tr>

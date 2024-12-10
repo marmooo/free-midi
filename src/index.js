@@ -836,11 +836,12 @@ function _detailFormatter(_index, row) {
 
 globalThis.toolEvents = {
   "click .bi-play-fill": (event, _value, row, _index) => {
-    const buttons = document.querySelectorAll("#midiList .play");
-    buttons.forEach((button) => button.disabled = true);
     switch (event.target.className) {
-      case "bi bi-play-fill":
+      case "bi bi-play-fill": {
+        const buttons = document.querySelectorAll("#midiList .play");
+        buttons.forEach((button) => button.disabled = true);
         return play(event.target, row);
+      }
       case "bi bi-play":
         return replay(event.target);
       case "bi bi-pause-fill":

@@ -148,7 +148,7 @@
             data-detail-view-icon="true">
           <thead>
             <tr>
-              <th data-field="tool" data-formatter="_toolFormatterEn" data-events="toolEvents"></th>
+              <th data-field="tool" data-formatter="_toolFormatter" data-events="toolEvents"></th>
               <th data-field="composer" data-sortable="true">Composer</th>
               <th data-field="born" data-visible="false" data-sortable="true">Born</th>
               <th data-field="died" data-visible="false" data-sortable="true">Died</th>
@@ -388,6 +388,11 @@
           </table>
         </div>
       </div>
+    </template>
+    <template id="play-button">
+      <button title="play" class="play btn p-0" type="button">
+        <i class="bi bi-play-fill"></i>
+      </button>
     </template>
     <div class="drop-inline-css
       page-item active

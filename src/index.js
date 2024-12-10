@@ -849,16 +849,10 @@ globalThis.toolEvents = {
   },
 };
 
-function _toolFormatterEn(_value, _row, _index) {
-  return `
-<button title="play" class="play btn p-0" type="button"><i class="bi bi-play-fill"></i></button>
-  `;
-}
-
-function _toolFormatterJa(_value, _row, _index) {
-  return `
-<button title="再生" class="play btn p-0" type="button"><i class="bi bi-play-fill"></i></button>
-  `;
+function _toolFormatter(_value, _row, _index) {
+  const button = document.getElementById("play-button")
+    .content.firstElementChild;
+  return button.outerHTML;
 }
 
 function play(node, row) {

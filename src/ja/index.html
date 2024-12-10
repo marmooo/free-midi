@@ -200,7 +200,7 @@ table.rc-table-resizing thead > th > a {
             data-detail-view-icon="true">
           <thead>
             <tr>
-              <th data-field="tool" data-formatter="_toolFormatterEn" data-events="toolEvents"></th>
+              <th data-field="tool" data-formatter="_toolFormatter" data-events="toolEvents"></th>
               <th data-field="composer" data-sortable="true">作曲者</th>
               <th data-field="born" data-visible="false" data-sortable="true">生年</th>
               <th data-field="died" data-visible="false" data-sortable="true">没年</th>
@@ -440,6 +440,11 @@ table.rc-table-resizing thead > th > a {
           </table>
         </div>
       </div>
+    </template>
+    <template id="play-button">
+      <button title="再生" class="play btn p-0" type="button">
+        <i class="bi bi-play-fill"></i>
+      </button>
     </template>
     <div class="drop-inline-css
       page-item active

@@ -267,6 +267,8 @@ async function loadSoundFont(player, name) {
   const programs = getPrograms(ns);
   await player.loadSoundFontDir(programs, soundFontDir);
   await player.loadNoteSequence(ns);
+  const buttons = document.querySelectorAll("#midiList .play");
+  buttons.forEach((button) => button.disabled = false);
 }
 
 function setTimer(seconds) {
@@ -832,15 +834,30 @@ function _detailFormatter(_index, row) {
   return div;
 }
 
+globalThis.toolEvents = {
+  "click .bi-play-fill": (event, _value, row, _index) => {
+    const buttons = document.querySelectorAll("#midiList .play");
+    buttons.forEach((button) => button.disabled = true);
+    switch (event.target.className) {
+      case "bi bi-play-fill":
+        return play(event.target, row);
+      case "bi bi-play":
+        return replay(event.target);
+      case "bi bi-pause-fill":
+        return pause(event.target);
+    }
+  },
+};
+
 function _toolFormatterEn(_value, _row, _index) {
   return `
-<button title="play" class="btn p-0" type="button"><i class="bi bi-play-fill"></i></button>
+<button title="play" class="play btn p-0" type="button"><i class="bi bi-play-fill"></i></button>
   `;
 }
 
 function _toolFormatterJa(_value, _row, _index) {
   return `
-<button title="再生" class="btn p-0" type="button"><i class="bi bi-play-fill"></i></button>
+<button title="再生" class="play btn p-0" type="button"><i class="bi bi-play-fill"></i></button>
   `;
 }
 
@@ -892,19 +909,6 @@ function pause(node) {
   player.pause();
   clearInterval(timer);
 }
-
-globalThis.toolEvents = {
-  "click .bi-play-fill": function (e, _value, row, _index) {
-    switch (e.target.className) {
-      case "bi bi-play-fill":
-        return play(e.target, row);
-      case "bi bi-play":
-        return replay(e.target);
-      case "bi bi-pause-fill":
-        return pause(e.target);
-    }
-  },
-};
 
 function getInstrumentsString(list, info) {
   const ids = info.instruments

@@ -504,7 +504,8 @@ function unlockAudio() {
   if (!player) return;
   if (!player.synth) return;
   player.resumeContext();
-  document.removeEventListener("click", unlockAudio);
+  document.removeEventListener("pointerdown", unlockAudio);
+  document.removeEventListener("keydown", unlockAudio);
 }
 
 async function playMIDI(seconds) {
@@ -1143,4 +1144,5 @@ document.getElementById("soundfonts").onchange = changeConfig;
 document.getElementById("inputSoundFontFile").onchange = loadSoundFontFileEvent;
 document.getElementById("inputSoundFontUrl").onchange = loadSoundFontUrlEvent;
 document.addEventListener("keydown", typeEvent);
-document.addEventListener("click", unlockAudio);
+document.addEventListener("pointerdown", unlockAudio, { once: true });
+document.addEventListener("keydown", unlockAudio, { once: true });

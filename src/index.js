@@ -82,6 +82,24 @@ class SoundFontPlayer {
     this.totalTicks = 0;
   }
 
+  async loadLibraries() {
+    await loadLibraries([
+      "https://cdn.jsdelivr.net/combine/npm/tone@14.7.77,npm/@magenta/music@1.23.1/es6/core.js",
+      "https://cdn.jsdelivr.net/npm/js-synthesizer@1.8.5/dist/js-synthesizer.min.js",
+      "https://cdn.jsdelivr.net/npm/js-synthesizer@1.8.5/externals/libfluidsynth-2.3.0-with-libsndfile.min.js",
+    ]);
+    await this.context.audioWorklet.addModule(
+      "https://cdn.jsdelivr.net/npm/js-synthesizer@1.8.5/externals/libfluidsynth-2.3.0-with-libsndfile.min.js",
+    );
+    await this.context.audioWorklet.addModule(
+      "https://cdn.jsdelivr.net/npm/js-synthesizer@1.8.5/dist/js-synthesizer.worklet.min.js",
+    );
+    this.synth = new JSSynth.AudioWorkletNodeSynthesizer();
+    this.synth.init(this.context.sampleRate);
+    const node = this.synth.createAudioNode(this.context);
+    node.connect(this.context.destination);
+  }
+
   async loadSoundFontDir(programs, dir) {
     const promises = programs.map((program) => {
       const programId = program.toString().padStart(3, "0");
@@ -114,19 +132,6 @@ class SoundFontPlayer {
   }
 
   async loadSoundFontBuffer(soundFontBuffer) {
-    if (!this.synth) {
-      await JSSynthPromise;
-      await this.context.audioWorklet.addModule(
-        "https://cdn.jsdelivr.net/npm/js-synthesizer@1.8.5/externals/libfluidsynth-2.3.0-with-libsndfile.min.js",
-      );
-      await this.context.audioWorklet.addModule(
-        "https://cdn.jsdelivr.net/npm/js-synthesizer@1.8.5/dist/js-synthesizer.worklet.min.js",
-      );
-      this.synth = new JSSynth.AudioWorkletNodeSynthesizer();
-      this.synth.init(this.context.sampleRate);
-      const node = this.synth.createAudioNode(this.context);
-      node.connect(this.context.destination);
-    }
     const soundFontId = await this.synth.loadSFont(soundFontBuffer);
     return soundFontId;
   }
@@ -243,10 +248,10 @@ function stopCallback() {
 function initPlayer() {
   // // Magenta.js
   // const runCallback = () => {};
-  // player = new MagentaPlayer(ns, runCallback, stopCallback);
+  // return new MagentaPlayer(ns, runCallback, stopCallback);
 
   // js-synthesizer
-  player = new SoundFontPlayer(stopCallback);
+  return new SoundFontPlayer(stopCallback);
 }
 
 function getPrograms(ns) {
@@ -1097,17 +1102,20 @@ function setFilterInstrumentsButtons() {
 }
 
 loadConfig();
+Module = {};
 const midiDB = "https://midi-db.pages.dev";
 const $table = $("#midiList");
 const filterTexts = initFilterTexts();
 const collections = new Map();
+const player = initPlayer();
+player.loadLibraries();
+
 let controllerDisabled;
 let currentTime = 0;
 let ns;
 let nsCache;
 let configChanged = false;
 let timer;
-let player;
 let filteredInstrumentNode;
 let filteredCollectionNode;
 
@@ -1120,17 +1128,6 @@ fetchCollections().then((data) => {
   fetchPlayList(data);
 });
 loadSoundFontList();
-
-Module = {};
-loadLibraries([
-  "https://cdn.jsdelivr.net/combine/npm/tone@14.7.77,npm/@magenta/music@1.23.1/es6/core.js",
-]).then(() => {
-  initPlayer();
-});
-const JSSynthPromise = loadLibraries([
-  "https://cdn.jsdelivr.net/npm/js-synthesizer@1.8.5/dist/js-synthesizer.min.js",
-  "https://cdn.jsdelivr.net/npm/js-synthesizer@1.8.5/externals/libfluidsynth-2.3.0-with-libsndfile.min.js",
-]);
 
 document.getElementById("toggleDarkMode").onclick = toggleDarkMode;
 document.getElementById("lang").onchange = changeLang;

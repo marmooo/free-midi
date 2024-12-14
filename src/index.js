@@ -238,7 +238,6 @@ class SoundFontPlayer {
 }
 
 function stopCallback() {
-  console.log("callback!");
   clearInterval(timer);
   currentTime = 0;
   initSeekbar(ns, 0);

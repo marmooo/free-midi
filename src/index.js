@@ -75,7 +75,7 @@ class SoundFontPlayer {
   constructor(stopCallback) {
     this.context = new globalThis.AudioContext();
     this.state = "stopped";
-    this.noCallback = false;
+    this.seekToZero = true;
     this.stopCallback = stopCallback;
     this.prevGain = 0.5;
     this.cacheUrls = new Array(128);
@@ -155,11 +155,10 @@ class SoundFontPlayer {
     await this.synth.waitForPlayerStopped();
     await this.synth.waitForVoicesStopped();
     this.state = "paused";
-    if (!this.noCallback) {
+    if (this.seekToZero) {
       player.seekTo(0);
       this.stopCallback();
     }
-    this.noCallback = false;
   }
 
   async start(ns, _qpm, seconds) {
@@ -168,14 +167,14 @@ class SoundFontPlayer {
     this.restart();
   }
 
-  stop(noCallback) {
-    if (noCallback) this.noCallback = true;
+  stop() {
+    this.seekToZero = true;
     if (this.synth) this.synth.stopPlayer();
   }
 
   pause() {
     this.state = "paused";
-    this.noCallback = true;
+    this.seekToZero = false;
     this.synth.stopPlayer();
   }
 
@@ -239,6 +238,7 @@ class SoundFontPlayer {
 }
 
 function stopCallback() {
+  console.log("callback!");
   clearInterval(timer);
   currentTime = 0;
   initSeekbar(ns, 0);
@@ -343,7 +343,7 @@ function speedUp() {
 async function changeSpeed(speed) {
   if (!ns) return;
   const playState = player.getPlayState();
-  player.stop(true);
+  player.stop();
   clearInterval(timer);
   const prevRate = nsCache.totalTime / ns.totalTime;
   const rate = prevRate / (speed / 100);
@@ -607,7 +607,7 @@ async function loadInstrumentList() {
 async function changeConfig() {
   switch (player.getPlayState()) {
     case "started": {
-      player.stop(true);
+      player.stop();
       setNoteInstruments(ns);
       if (player instanceof SoundFontPlayer) {
         await loadSoundFont(player);
@@ -874,7 +874,7 @@ function play(node, row) {
     prevNode.className = "bi bi-play-fill";
   });
   if (!player) return;
-  if (player.synth) player.stop(true);
+  if (player.synth) player.stop();
   node.className = "bi bi-pause-fill";
   const url = `${midiDB}/${row.file}`;
   loadMIDI(url).then(() => {
@@ -889,7 +889,7 @@ function replay(node) {
   }
   node.className = "bi bi-pause-fill";
   if (configChanged) {
-    player.stop(true);
+    player.stop();
     const seconds = parseInt(document.getElementById("seekbar").value);
     const input = document.getElementById("speed");
     const speed = input.value / 100;
@@ -1104,7 +1104,8 @@ function setFilterInstrumentsButtons() {
 
 loadConfig();
 Module = {};
-const midiDB = "https://midi-db.pages.dev";
+// const midiDB = "https://midi-db.pages.dev";
+const midiDB = "/midi-db";
 const $table = $("#midiList");
 const filterTexts = initFilterTexts();
 const collections = new Map();

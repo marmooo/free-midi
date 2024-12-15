@@ -20,62 +20,13 @@ function changeLang() {
   location.href = `/free-midi/${lang}/`;
 }
 
-// class MagentaPlayer extends core.SoundFontPlayer {
-//   constructor(ns, runCallback, stopCallback) {
-//     const soundFontUrl =
-//       "https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus";
-//     const callback = {
-//       run: (note) => runCallback(note),
-//       stop: () => stopCallback(),
-//     };
-//     super(soundFontUrl, undefined, undefined, undefined, callback);
-//     this.ns = ns;
-//     this.output.volume.value = 20 * Math.log(0.5) / Math.log(10);
-//   }
-
-//   async loadSamples(ns) {
-//     await super.loadSamples(ns);
-//     this.synth = true;
-//     this.ns = ns;
-//   }
-
-//   start(ns) {
-//     return super.start(ns);
-//   }
-
-//   restart(seconds) {
-//     if (seconds) {
-//       return super.start(this.ns, undefined, seconds / ns.ticksPerQuarter);
-//     } else {
-//       return this.start(this.ns);
-//     }
-//   }
-
-//   resume(seconds) {
-//     super.resume();
-//     this.seekTo(seconds);
-//   }
-
-//   changeVolume(volume) {
-//     // 0 <= volume <= 100 --> 1e-5 <= dB <= 1 --> -100 <= slider <= 0
-//     if (volume == 0) {
-//       volume = -100;
-//     } else {
-//       volume = 20 * Math.log(volume / 100) / Math.log(10);
-//     }
-//     this.output.volume.value = volume;
-//   }
-
-//   changeMute(status) {
-//     this.output.mute = status;
-//   }
-// }
-
 class SoundFontPlayer {
+  midi;
+
   constructor(stopCallback) {
     this.context = new globalThis.AudioContext();
     this.state = "stopped";
-    this.seekToZero = true;
+    this.noCallback = false;
     this.stopCallback = stopCallback;
     this.prevGain = 0.5;
     this.cacheUrls = new Array(128);
@@ -84,7 +35,6 @@ class SoundFontPlayer {
 
   async loadLibraries() {
     await loadLibraries([
-      "https://cdn.jsdelivr.net/combine/npm/tone@14.7.77,npm/@magenta/music@1.23.1/es6/core.js",
       "https://cdn.jsdelivr.net/npm/js-synthesizer@1.8.5/dist/js-synthesizer.min.js",
       "https://cdn.jsdelivr.net/npm/js-synthesizer@1.8.5/externals/libfluidsynth-2.3.0-with-libsndfile.min.js",
     ]);
@@ -100,12 +50,12 @@ class SoundFontPlayer {
     node.connect(this.context.destination);
   }
 
-  async loadSoundFontDir(programs, dir) {
-    const promises = programs.map((program) => {
-      const programId = program.toString().padStart(3, "0");
-      const url = `${dir}/${programId}.sf3`;
-      if (this.cacheUrls[program] == url) return true;
-      this.cacheUrls[program] = url;
+  async loadSoundFontDir(instruments, dir) {
+    const promises = instruments.map((instrument) => {
+      const instrumentId = instrument.toString().padStart(3, "0");
+      const url = `${dir}/${instrumentId}.sf3`;
+      if (this.cacheUrls[instrument] == url) return true;
+      this.cacheUrls[instrument] = url;
       return this.fetchBuffer(url);
     });
     const buffers = await Promise.all(promises);
@@ -136,12 +86,11 @@ class SoundFontPlayer {
     return soundFontId;
   }
 
-  async loadNoteSequence(ns) {
+  async loadNoteSequence(midi) {
     await this.synth.resetPlayer();
-    this.ns = ns;
-    const midiBuffer = core.sequenceProtoToMidi(ns);
-    this.totalTicks = this.calcTick(ns.totalTime);
-    return this.synth.addSMFDataToPlayer(midiBuffer);
+    this.midi = midi;
+    this.totalTicks = this.calcTick(midi.duration);
+    return this.synth.addSMFDataToPlayer(midi.toArray());
   }
 
   resumeContext() {
@@ -155,26 +104,28 @@ class SoundFontPlayer {
     await this.synth.waitForPlayerStopped();
     await this.synth.waitForVoicesStopped();
     this.state = "paused";
-    if (this.seekToZero) {
+    this.finished = true;
+    if (!this.noCallback) {
       player.seekTo(0);
       this.stopCallback();
     }
+    this.noCallback = false;
   }
 
-  async start(ns, _qpm, seconds) {
-    if (ns) await this.loadNoteSequence(ns);
+  async start(midi, seconds) {
+    if (midi) await this.loadNoteSequence(midi);
     if (seconds) this.seekTo(seconds);
     this.restart();
   }
 
   stop() {
-    this.seekToZero = true;
+    this.noCallback = true;
     if (this.synth) this.synth.stopPlayer();
   }
 
   pause() {
     this.state = "paused";
-    this.seekToZero = false;
+    this.noCallback = true;
     this.synth.stopPlayer();
   }
 
@@ -198,31 +149,14 @@ class SoundFontPlayer {
   }
 
   calcTick(seconds) {
-    let tick = 0;
-    let prevTime = 0;
-    let prevQpm = 120;
-    for (const tempo of this.ns.tempos) {
-      const currTime = tempo.time;
-      const currQpm = tempo.qpm;
-      if (currTime < seconds) {
-        const t = currTime - prevTime;
-        tick += prevQpm / 60 * t * this.ns.ticksPerQuarter;
-      } else {
-        const t = seconds - prevTime;
-        tick += prevQpm / 60 * t * this.ns.ticksPerQuarter;
-        return Math.round(tick);
-      }
-      prevTime = currTime;
-      prevQpm = currQpm;
-    }
-    const t = seconds - prevTime;
-    tick += prevQpm / 60 * t * this.ns.ticksPerQuarter;
-    return Math.floor(tick);
+    const time = this.midi.duration;
+    const ticks = this.midi.durationTicks;
+    return Math.floor(ticks * seconds / time);
   }
 
   seekTo(seconds) {
-    const tick = this.calcTick(seconds);
-    this.synth.seekPlayer(tick);
+    const ticks = this.calcTick(seconds);
+    this.synth.seekPlayer(ticks);
   }
 
   isPlaying() {
@@ -240,24 +174,24 @@ class SoundFontPlayer {
 function stopCallback() {
   clearInterval(timer);
   currentTime = 0;
-  initSeekbar(ns, 0);
+  initSeekbar(midi, 0);
   playNext();
 }
 
 function initPlayer() {
-  // // Magenta.js
-  // const runCallback = () => {};
-  // return new MagentaPlayer(ns, runCallback, stopCallback);
-
-  // js-synthesizer
   return new SoundFontPlayer(stopCallback);
 }
 
-function getPrograms(ns) {
-  const programs = new Set();
-  ns.notes.forEach((note) => programs.add(note.program));
-  if (ns.notes.some((note) => note.isDrum)) programs.add(128);
-  return [...programs];
+function getInstruments(midi) {
+  const instruments = new Set();
+  midi.tracks.forEach((track) => {
+    if (track.channel === 10) {
+      instruments.add(128); // percussion
+    } else {
+      instruments.add(track.instrument.number);
+    }
+  });
+  return Array.from(instruments);
 }
 
 async function loadSoundFont(player, name) {
@@ -268,9 +202,9 @@ async function loadSoundFont(player, name) {
     name = soundfonts.options[index].value;
   }
   const soundFontDir = `https://soundfonts.pages.dev/${name}`;
-  const programs = getPrograms(ns);
-  await player.loadSoundFontDir(programs, soundFontDir);
-  await player.loadNoteSequence(ns);
+  const instruments = getInstruments(midi);
+  await player.loadSoundFontDir(instruments, soundFontDir);
+  await player.loadNoteSequence(midi);
   const buttons = document.querySelectorAll("#midiList .play");
   buttons.forEach((button) => button.disabled = false);
 }
@@ -278,7 +212,7 @@ async function loadSoundFont(player, name) {
 function setTimer(seconds) {
   const delay = 100;
   const startTime = Date.now() - seconds * 1000;
-  const totalTime = ns.totalTime;
+  const totalTime = midi.duration;
   clearInterval(timer);
   timer = setInterval(() => {
     const nextTime = (Date.now() - startTime) / 1000;
@@ -340,20 +274,20 @@ function speedUp() {
 }
 
 async function changeSpeed(speed) {
-  if (!ns) return;
+  if (!midi) return;
   const playState = player.getPlayState();
   player.stop();
   clearInterval(timer);
-  const prevRate = nsCache.totalTime / ns.totalTime;
+  const prevRate = midiCache.duration / midi.duration;
   const rate = prevRate / (speed / 100);
   const newSeconds = currentTime * rate;
-  setSpeed(ns, speed);
-  initSeekbar(ns, newSeconds);
+  setSpeed(midi, speed);
+  initSeekbar(midi, newSeconds);
   if (playState == "started") {
     setLoadingTimer(newSeconds);
-    player.start(ns);
+    player.start(midi);
   } else if (player instanceof SoundFontPlayer) {
-    await player.loadNoteSequence(ns);
+    await player.loadNoteSequence(midi);
     player.seekTo(newSeconds);
   }
 }
@@ -364,28 +298,13 @@ function changeSpeedEvent(event) {
   changeSpeed(speed);
 }
 
-function setSpeed(ns, speed) {
+function setSpeed(midi, speed) {
   if (speed <= 0) speed = 1;
   speed /= 100;
-  const controlChanges = nsCache.controlChanges;
-  ns.controlChanges.forEach((n, i) => {
-    n.time = controlChanges[i].time / speed;
+  const tempos = midi.header.tempos;
+  midiCache.header.tempos.forEach((tempo, i) => {
+    tempos[i].bpm = tempo.bpm * speed;
   });
-  const tempos = nsCache.tempos;
-  ns.tempos.forEach((n, i) => {
-    n.time = tempos[i].time / speed;
-    n.qpm = tempos[i].qpm * speed;
-  });
-  const timeSignatures = nsCache.timeSignatures;
-  ns.timeSignatures.forEach((n, i) => {
-    n.time = timeSignatures[i].time / speed;
-  });
-  const notes = nsCache.notes;
-  ns.notes.forEach((n, i) => {
-    n.startTime = notes[i].startTime / speed;
-    n.endTime = notes[i].endTime / speed;
-  });
-  ns.totalTime = nsCache.totalTime / speed;
 }
 
 function repeat() {
@@ -442,43 +361,39 @@ function updateSeekbar(seconds) {
   document.getElementById("currentTime").textContent = time;
 }
 
-function initSeekbar(ns, seconds) {
-  document.getElementById("seekbar").max = ns.totalTime;
+function initSeekbar(midi, seconds) {
+  const totalTime = midi.duration;
+  document.getElementById("seekbar").max = totalTime;
   document.getElementById("seekbar").value = seconds;
-  document.getElementById("totalTime").textContent = formatTime(ns.totalTime);
+  document.getElementById("totalTime").textContent = formatTime(totalTime);
   document.getElementById("currentTime").textContent = formatTime(seconds);
 }
 
-function convertGM(ns) {
-  ns.controlChanges = ns.controlChanges.filter((n) =>
-    n.controlNumber == 0 || n.controlNumber == 32
-  );
+function convertGM(midi) {
+  midi.tracks.forEach((track) => {
+    const cc = track.controlChanges;
+    delete cc[0];
+    delete cc[32];
+  });
+}
+
+function addWaitTicks(midi) {
+  const waitTicks = 1;
+  midi.header.tempos.forEach((tempo) => {
+    tempo.ticks += waitTicks;
+  });
+  midi.tracks.forEach((track) => {
+    track.notes.forEach((note) => {
+      note.ticks += waitTicks;
+    });
+  });
 }
 
 async function loadMIDI(url) {
-  ns = await core.urlToNoteSequence(url);
-  convertGM(ns);
-
-  const waitTime = 0.2;
-  ns.totalTime += waitTime;
-  ns.notes.forEach((note) => {
-    note.startTime += waitTime;
-    note.endTime += waitTime;
-  });
-  ns.controlChanges.forEach((cc) => {
-    cc.time += waitTime;
-  });
-  ns.tempos.slice(1).forEach((tempo) => {
-    tempo.time += waitTime;
-  });
-  ns.timeSignatures.slice(1).forEach((ts) => {
-    ts.time += waitTime;
-  });
-  nsCache = core.sequences.clone(ns);
-  ns.controlChanges.forEach((n) => n.p = n.program);
-  ns.notes.map((note) => {
-    note.p = note.program;
-  });
+  midi = await Midi.fromUrl(url);
+  convertGM(midi);
+  addWaitTicks(midi);
+  midiCache = midi.clone();
 }
 
 async function loadSoundFontFileEvent(event) {
@@ -510,17 +425,17 @@ function unlockAudio() {
 async function playMIDI(seconds) {
   disableController();
   clearInterval(timer);
-  setNoteInstruments(ns);
+  setNoteInstruments(midi);
   if (player instanceof SoundFontPlayer) {
     await loadSoundFont(player);
   }
   const speed = parseInt(document.getElementById("speed").value);
-  setSpeed(ns, speed);
+  setSpeed(midi, speed);
   const volume = parseInt(document.getElementById("volumebar").value);
   player.changeVolume(volume);
   setLoadingTimer(seconds);
-  player.start(ns);
-  initSeekbar(ns, seconds);
+  player.start(midi);
+  initSeekbar(midi, seconds);
   enableController();
 }
 
@@ -562,14 +477,14 @@ function playNext() {
   }
 }
 
-function setNoteInstruments(ns) {
+function setNoteInstruments(midi) {
   const index = document.getElementById("instruments").selectedIndex - 1;
-  if (index > 0) {
-    ns.controlChanges.forEach((n) => n.program = index);
-    ns.notes.forEach((n) => n.program = index);
+  if (index >= 0) {
+    midi.tracks.forEach((track) => track.instrument.number = index);
   } else {
-    ns.controlChanges.forEach((n) => n.program = n.p);
-    ns.notes.forEach((n) => n.program = n.p);
+    midi.tracks.forEach((track, i) => {
+      track.instrument.number = midiCache.tracks[i].instrument.number;
+    });
   }
 }
 
@@ -607,16 +522,16 @@ async function changeConfig() {
   switch (player.getPlayState()) {
     case "started": {
       player.stop();
-      setNoteInstruments(ns);
+      setNoteInstruments(midi);
       if (player instanceof SoundFontPlayer) {
         await loadSoundFont(player);
       }
       const speed = parseInt(document.getElementById("speed").value);
-      setSpeed(ns, speed);
+      setSpeed(midi, speed);
       const seconds = parseInt(document.getElementById("seekbar").value);
-      initSeekbar(ns, seconds);
+      initSeekbar(midi, seconds);
       setLoadingTimer(seconds);
-      player.start(ns);
+      player.start(midi);
       break;
     }
     case "paused":
@@ -1103,7 +1018,8 @@ function setFilterInstrumentsButtons() {
 
 loadConfig();
 Module = {};
-const midiDB = "https://midi-db.pages.dev";
+// const midiDB = "https://midi-db.pages.dev";
+const midiDB = "/midi-db";
 const $table = $("#midiList");
 const filterTexts = initFilterTexts();
 const collections = new Map();
@@ -1112,8 +1028,8 @@ player.loadLibraries();
 
 let controllerDisabled;
 let currentTime = 0;
-let ns;
-let nsCache;
+let midi;
+let midiCache;
 let configChanged = false;
 let timer;
 let filteredInstrumentNode;

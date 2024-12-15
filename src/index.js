@@ -50,7 +50,7 @@ class SoundFontPlayer {
     this.synth.init(this.context.sampleRate);
     const node = this.synth.createAudioNode(this.context);
     node.connect(this.context.destination);
-    this.loaded = true;
+    this.loadedLibraries = true;
   }
 
   async loadSoundFontDir(instruments, dir) {

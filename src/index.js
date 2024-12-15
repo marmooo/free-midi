@@ -35,6 +35,7 @@ class SoundFontPlayer {
 
   async loadLibraries() {
     await loadLibraries([
+      "https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.28/build/Midi.min.js",
       "https://cdn.jsdelivr.net/npm/js-synthesizer@1.8.5/dist/js-synthesizer.min.js",
       "https://cdn.jsdelivr.net/npm/js-synthesizer@1.8.5/externals/libfluidsynth-2.3.0-with-libsndfile.min.js",
     ]);
@@ -1019,6 +1020,13 @@ function setFilterInstrumentsButtons() {
   });
 }
 
+async function loadPlayerLibraries() {
+  await player.loadLibraries();
+  document.querySelectorAll("#midiList .play").forEach((button) => {
+    button.disabled = false;
+  });
+}
+
 loadConfig();
 Module = {};
 const midiDB = "https://midi-db.pages.dev";
@@ -1026,7 +1034,6 @@ const $table = $("#midiList");
 const filterTexts = initFilterTexts();
 const collections = new Map();
 const player = initPlayer();
-player.loadLibraries();
 
 let controllerDisabled;
 let currentTime = 0;
@@ -1063,3 +1070,5 @@ document.getElementById("inputSoundFontUrl").onchange = loadSoundFontUrlEvent;
 document.addEventListener("keydown", typeEvent);
 document.addEventListener("pointerdown", unlockAudio, { once: true });
 document.addEventListener("keydown", unlockAudio, { once: true });
+document.addEventListener("pointerdown", loadPlayerLibraries, { once: true });
+document.addEventListener("keydown", loadPlayerLibraries, { once: true });

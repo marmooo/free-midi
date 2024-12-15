@@ -22,15 +22,16 @@ function changeLang() {
 
 class SoundFontPlayer {
   midi;
+  context = new globalThis.AudioContext();
+  state = "stopped";
+  loadedLibraries = false;
+  noCallback = false;
+  prevGain = 0.5;
+  totalTicks = 0;
+  cacheUrls = new Array(128);
 
   constructor(stopCallback) {
-    this.context = new globalThis.AudioContext();
-    this.state = "stopped";
-    this.noCallback = false;
     this.stopCallback = stopCallback;
-    this.prevGain = 0.5;
-    this.cacheUrls = new Array(128);
-    this.totalTicks = 0;
   }
 
   async loadLibraries() {
@@ -49,6 +50,7 @@ class SoundFontPlayer {
     this.synth.init(this.context.sampleRate);
     const node = this.synth.createAudioNode(this.context);
     node.connect(this.context.destination);
+    this.loaded = true;
   }
 
   async loadSoundFontDir(instruments, dir) {
@@ -715,9 +717,8 @@ function toURLSearchParams(row) {
 }
 
 function _detailFormatter(_index, row) {
-  const template = document.getElementById("detail-box")
-    .content.cloneNode(true);
-  const div = template.firstElementChild;
+  const div = document.getElementById("detail-box")
+    .content.firstElementChild.cloneNode(true);
   const midiURL = `${midiDB}/${row.file}`;
   const params = toURLSearchParams(row);
   const query = params.toString();
@@ -777,7 +778,10 @@ globalThis.toolEvents = {
 
 function _toolFormatter(_value, _row, _index) {
   const button = document.getElementById("play-button")
-    .content.firstElementChild;
+    .content.firstElementChild.cloneNode(true);
+  if (!player.loadedLibraries) {
+    button.disabled = true;
+  }
   return button.outerHTML;
 }
 

@@ -551,6 +551,7 @@ function addFilterControl() {
     const name = th.dataset.field;
     const fht = th.querySelector("div.fht-cell");
     const input = document.createElement("input");
+    input.title = `search ${name}`;
     input.type = "search";
     input.className = "form-control";
     const placeholder = getFilterPlaceholder(name);

@@ -1018,8 +1018,7 @@ function setFilterInstrumentsButtons() {
 
 loadConfig();
 Module = {};
-// const midiDB = "https://midi-db.pages.dev";
-const midiDB = "/midi-db";
+const midiDB = "https://midi-db.pages.dev";
 const $table = $("#midiList");
 const filterTexts = initFilterTexts();
 const collections = new Map();

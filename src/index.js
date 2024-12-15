@@ -27,7 +27,6 @@ class SoundFontPlayer {
   loadedLibraries = false;
   noCallback = false;
   prevGain = 0.5;
-  totalTicks = 0;
   cacheUrls = new Array(128);
 
   constructor(stopCallback) {
@@ -92,7 +91,6 @@ class SoundFontPlayer {
   async loadNoteSequence(midi) {
     await this.synth.resetPlayer();
     this.midi = midi;
-    this.totalTicks = this.calcTick(midi.duration);
     return this.synth.addSMFDataToPlayer(midi.toArray());
   }
 

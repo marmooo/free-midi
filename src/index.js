@@ -369,11 +369,14 @@ function initSeekbar(midi, seconds) {
   document.getElementById("currentTime").textContent = formatTime(seconds);
 }
 
-function convertGM(midi) {
+function setControlChanges(midi) {
   midi.tracks.forEach((track) => {
+    // convert to GM
     const cc = track.controlChanges;
     delete cc[0];
     delete cc[32];
+    // Reset All Controllers
+    track.addCC({ number: 121, ticks: 0, value: 0 });
   });
 }
 
@@ -391,7 +394,7 @@ function addWaitTicks(midi) {
 
 async function loadMIDI(url) {
   midi = await Midi.fromUrl(url);
-  convertGM(midi);
+  setControlChanges(midi);
   addWaitTicks(midi);
   midiCache = midi.clone();
 }

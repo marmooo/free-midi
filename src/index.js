@@ -383,8 +383,15 @@ function setControlChanges(midi) {
 
 function addWaitTicks(midi) {
   const waitTicks = 1;
-  midi.header.tempos.forEach((tempo) => {
+  const header = midi.header;
+  header.tempos.forEach((tempo) => {
     tempo.ticks += waitTicks;
+  });
+  header.keySignatures.forEach((signature) => {
+    signature.ticks += waitTicks;
+  });
+  header.timeSignatures.forEach((signature) => {
+    signature.ticks += waitTicks;
   });
   midi.tracks.forEach((track) => {
     track.notes.forEach((note) => {

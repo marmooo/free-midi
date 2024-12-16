@@ -227,7 +227,7 @@ function setTimer(seconds) {
   }, delay);
 }
 
-// fix delay caused by player.start(ns) by seeking after playing
+// fix delay caused by player.start(midi) by seeking after playing
 function setLoadingTimer(time) {
   const loadingTimer = setInterval(() => {
     if (player.isPlaying()) {

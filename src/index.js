@@ -1030,7 +1030,6 @@ async function loadPlayerLibraries() {
   });
 }
 
-loadConfig();
 Module = {};
 const midiDB = "https://midi-db.pages.dev";
 const $table = $("#midiList");

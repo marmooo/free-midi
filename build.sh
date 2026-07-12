@@ -1,5 +1,4 @@
 mkdir -p docs
 cp -r src/* docs
-# drop-inline-css -r src -o docs
-drop-inline-css -r src/index.js -o docs/index.js
+drop-inline-css -r src -o docs
 minify -r docs -o .

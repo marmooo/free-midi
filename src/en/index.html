@@ -38,6 +38,7 @@
     <link class="drop-inline-css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <style>
       #midi-player { height:34px; }
+      #midi-table { height: 525px; }
       #table > tbody > tr > td {
         overflow: hidden;
         text-overflow: ellipsis;
@@ -269,22 +270,24 @@
           </svg>
         </button>
       </div>
-      <div class="toolbar">
-        <div id="columns"></div>
+      <div id="midi-table">
+        <div class="toolbar">
+          <div id="columns"></div>
+        </div>
+        <div class="table-responsive text-nowrap">
+          <table id="table" class="table table-striped table-hover table-bordered table-sm align-middle">
+            <thead><!-- drop-inline-css !-->
+              <tr><th></th></tr>
+              <tr><td></td></tr>
+            </thead>
+            <tbody>
+              <tr><th></th></tr>
+              <tr><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="pagination" class="d-flex justify-content-center"></div>
       </div>
-      <div class="table-responsive text-nowrap">
-        <table id="table" class="table table-striped table-hover table-bordered table-sm align-middle">
-          <thead><!-- drop-inline-css !-->
-            <tr><th></th></tr>
-            <tr><td></td></tr>
-          </thead>
-          <tbody>
-            <tr><th></th></tr>
-            <tr><td></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div id="pagination" class="d-flex justify-content-center"></div>
       <div id="filterInstruments" class="card mt-3">
         <h5 class="card-header">Filter Instruments</h5>
         <div class="card-body d-flex flex-wrap">
@@ -428,138 +431,6 @@
         </div>
       </div>
     </div>
-    <template id="midi-instrument">
-      <select>
-        <option>Acoustic Piano</option>
-        <option>Bright Piano</option>
-        <option>Electric Grand Piano</option>
-        <option>Honky-tonk Piano</option>
-        <option>Electric Piano</option>
-        <option>Electric Piano 2</option>
-        <option>Harpsichord</option>
-        <option>Clavi</option>
-        <option>Celesta</option>
-        <option>Glockenspiel</option>
-        <option>Music box</option>
-        <option>Vibraphone</option>
-        <option>Marimba</option>
-        <option>Xylophone</option>
-        <option>Tubular Bell</option>
-        <option>Dulcimer</option>
-        <option>Drawbar Organ</option>
-        <option>Percussive Organ</option>
-        <option>Rock Organ</option>
-        <option>Church organ</option>
-        <option>Reed organ</option>
-        <option>Accordion</option>
-        <option>Harmonica</option>
-        <option>Tango Accordion</option>
-        <option>Acoustic Guitar (nylon)</option>
-        <option>Acoustic Guitar (steel)</option>
-        <option>Electric Guitar (jazz)</option>
-        <option>Electric Guitar (clean)</option>
-        <option>Electric Guitar (muted)</option>
-        <option>Overdriven Guitar</option>
-        <option>Distortion Guitar</option>
-        <option>Guitar harmonics</option>
-        <option>Acoustic Bass</option>
-        <option>Electric Bass (finger)</option>
-        <option>Electric Bass (pick)</option>
-        <option>Fretless Bass</option>
-        <option>Slap Bass 1</option>
-        <option>Slap Bass 2</option>
-        <option>Synth Bass 1</option>
-        <option>Synth Bass 2</option>
-        <option>Violin</option>
-        <option>Viola</option>
-        <option>Cello</option>
-        <option>Double bass</option>
-        <option>Tremolo Strings</option>
-        <option>Pizzicato Strings</option>
-        <option>Orchestral Harp</option>
-        <option>Timpani</option>
-        <option>String Ensemble 1</option>
-        <option>String Ensemble 2</option>
-        <option>Synth Strings 1</option>
-        <option>Synth Strings 2</option>
-        <option>Voice Aahs</option>
-        <option>Voice Oohs</option>
-        <option>Synth Voice</option>
-        <option>Orchestra Hit</option>
-        <option>Trumpet</option>
-        <option>Trombone</option>
-        <option>Tuba</option>
-        <option>Muted Trumpet</option>
-        <option>French horn</option>
-        <option>Brass Section</option>
-        <option>Synth Brass 1</option>
-        <option>Synth Brass 2</option>
-        <option>Soprano Sax</option>
-        <option>Alto Sax</option>
-        <option>Tenor Sax</option>
-        <option>Baritone Sax</option>
-        <option>Oboe</option>
-        <option>English Horn</option>
-        <option>Bassoon</option>
-        <option>Clarinet</option>
-        <option>Piccolo</option>
-        <option>Flute</option>
-        <option>Recorder</option>
-        <option>Pan Flute</option>
-        <option>Blown Bottle</option>
-        <option>Shakuhachi</option>
-        <option>Whistle</option>
-        <option>Ocarina</option>
-        <option>Lead 1 (square)</option>
-        <option>Lead 2 (sawtooth)</option>
-        <option>Lead 3 (calliope)</option>
-        <option>Lead 4 (chiff)</option>
-        <option>Lead 5 (charang)</option>
-        <option>Lead 6 (voice)</option>
-        <option>Lead 7 (fifths)</option>
-        <option>Lead 8 (bass + lead)</option>
-        <option>Pad 1 (Fantasia)</option>
-        <option>Pad 2 (warm)</option>
-        <option>Pad 3 (polysynth)</option>
-        <option>Pad 4 (choir)</option>
-        <option>Pad 5 (bowed)</option>
-        <option>Pad 6 (metallic)</option>
-        <option>Pad 7 (halo)</option>
-        <option>Pad 8 (sweep)</option>
-        <option>FX 1 (rain)</option>
-        <option>FX 2 (soundtrack)</option>
-        <option>FX 3 (crystal)</option>
-        <option>FX 4 (atmosphere)</option>
-        <option>FX 5 (brightness)</option>
-        <option>FX 6 (goblins)</option>
-        <option>FX 7 (echoes)</option>
-        <option>FX 8 (sci-fi)</option>
-        <option>Sitar</option>
-        <option>Banjo</option>
-        <option>Shamisen</option>
-        <option>Koto</option>
-        <option>Kalimba</option>
-        <option>Bagpipe</option>
-        <option>Fiddle</option>
-        <option>Shanai</option>
-        <option>Tinkle Bell</option>
-        <option>Agogo</option>
-        <option>Steel Drums</option>
-        <option>Woodblock</option>
-        <option>Taiko Drum</option>
-        <option>Melodic Tom</option>
-        <option>Synth Drum</option>
-        <option>Reverse Cymbal</option>
-        <option>Guitar Fret Noise</option>
-        <option>Breath Noise</option>
-        <option>Seashore</option>
-        <option>Bird Tweet</option>
-        <option>Telephone Ring</option>
-        <option>Helicopter</option>
-        <option>Applause</option>
-        <option>Gunshot</option>
-      </select>
-    </template>
     <div class="drop-inline-css
       btn bg-light-subtle p-1 form-range
       modal-backdrop show

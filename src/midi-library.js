@@ -167,8 +167,8 @@ export class MidiLibrary {
 
       const label = document.createElement("label");
       label.className = collection.status === "CLOSED"
-        ? "btn btn-sm btn-outline-secondary m-1"
-        : "btn btn-sm btn-outline-primary m-1";
+        ? "btn btn-sm btn-outline-secondary"
+        : "btn btn-sm btn-outline-primary";
       label.htmlFor = id;
       label.textContent = collection.name;
 
@@ -203,7 +203,7 @@ export class MidiLibrary {
       radio.autocomplete = "off";
 
       const label = document.createElement("label");
-      label.className = "btn btn-sm btn-outline-info m-1";
+      label.className = "btn btn-sm btn-outline-info";
       label.htmlFor = id;
       label.textContent = group.label;
 

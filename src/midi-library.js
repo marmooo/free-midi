@@ -4,7 +4,7 @@ import {
   Resizable,
   Sortable,
   Table,
-} from "https://cdn.jsdelivr.net/npm/@marmooo/table@0.0.1/+esm";
+} from "https://cdn.jsdelivr.net/npm/@marmooo/table@0.0.2/+esm";
 
 const DEFAULT_MIDI_DB = "https://midi-db.pages.dev";
 const DEFAULT_INSTRUMENT_GROUPS = [
@@ -101,8 +101,9 @@ export class MidiLibrary {
   }
 
   complementTable(info, data) {
-    const { country, composer, maintainer, web, license } = info;
+    const { name, country, composer, maintainer, web, license } = info;
     data.forEach((datum) => {
+      if (!datum.collection) datum.collection = name;
       if (!datum.country && country) datum.country = country;
       if (!datum.composer && composer) datum.composer = composer;
       if (!datum.maintainer && maintainer) datum.maintainer = maintainer;
@@ -176,10 +177,10 @@ export class MidiLibrary {
         if (radio === checkedRadio) {
           radio.checked = false;
           checkedRadio = null;
-          this.filterTable("file", "");
+          this.filterTable("collection", "");
         } else {
           checkedRadio = radio;
-          this.filterTable("file", collection.id);
+          this.filterTable("collection", collection.name);
         }
       });
 
@@ -401,10 +402,11 @@ export class MidiLibrary {
         searchPlaceholder: "Search e-mail...",
       },
       {
-        id: "web",
-        name: "Web",
+        id: "collection",
+        name: "HP",
         visible: true,
-        searchPlaceholder: "Search web...",
+        searchPlaceholder: "Search HP...",
+        datalist: true,
         render: (row, td) => {
           td.innerHTML = this.toWeb(row.file);
         },

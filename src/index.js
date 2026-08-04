@@ -91,7 +91,7 @@ function toDownload(url, lang, redistribution) {
         return "HP からダウンロードしてください。";
       case "en":
       default:
-        return "Download from the homepage.";
+        return "Download from the HP.";
     }
   } else {
     return toLink(url, "MIDI");

@@ -1,4 +1,4 @@
-import { Midy } from "https://cdn.jsdelivr.net/gh/marmooo/midy@0.5.8/dist/midy.min.js";
+import { Midy } from "https://cdn.jsdelivr.net/gh/marmooo/midy@0.6.0/dist/midy.min.js";
 import { MIDIPlayer } from "https://cdn.jsdelivr.net/npm/@marmooo/midi-player@0.0.7/+esm";
 import { Modal } from "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/+esm";
 import { MidiLibrary } from "/free-midi/midi-library.js";
@@ -256,8 +256,6 @@ const audioContext = new AudioContext();
 if (audioContext.state === "running") await audioContext.suspend();
 const midy = new Midy(audioContext);
 midy.cacheMode = "chunk";
-midy.startDelay = 0.5;
-
 const midiPlayer = new MIDIPlayer(midy);
 midiPlayer.defaultLayout();
 midiPlayer.applyTheme(getGlobalCSS(), {

@@ -1,5 +1,5 @@
 import { Midy } from "https://cdn.jsdelivr.net/gh/marmooo/midy@0.6.0/dist/midy.min.js";
-import { MIDIPlayer } from "https://cdn.jsdelivr.net/npm/@marmooo/midi-player@0.0.7/+esm";
+import { MIDIPlayer } from "https://cdn.jsdelivr.net/npm/@marmooo/midi-player@0.0.8/+esm";
 import { Modal } from "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/+esm";
 import { MidiLibrary } from "/free-midi/midi-library.js";
 

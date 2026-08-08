@@ -4,7 +4,7 @@ import {
   Resizable,
   Sortable,
   Table,
-} from "https://cdn.jsdelivr.net/npm/@marmooo/table@0.0.3/+esm";
+} from "https://cdn.jsdelivr.net/npm/@marmooo/table@0.0.4/+esm";
 
 const DEFAULT_MIDI_DB = "https://midi-db.pages.dev";
 const DEFAULT_INSTRUMENT_GROUPS = [
@@ -182,6 +182,7 @@ export class MidiLibrary {
           checkedRadio = radio;
           this.filterTable("collection", collection.name);
         }
+        this.table?.resetColumnWidths();
       });
 
       root.appendChild(radio);
@@ -217,6 +218,7 @@ export class MidiLibrary {
           checkedRadio = radio;
           this.filterByInstrumentNumbers(group.numbers);
         }
+        this.table?.resetColumnWidths();
       });
 
       root.appendChild(radio);

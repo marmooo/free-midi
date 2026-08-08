@@ -4,7 +4,7 @@ import {
   Resizable,
   Sortable,
   Table,
-} from "https://cdn.jsdelivr.net/npm/@marmooo/table@0.0.2/+esm";
+} from "https://cdn.jsdelivr.net/npm/@marmooo/table@0.0.3/+esm";
 
 const DEFAULT_MIDI_DB = "https://midi-db.pages.dev";
 const DEFAULT_INSTRUMENT_GROUPS = [

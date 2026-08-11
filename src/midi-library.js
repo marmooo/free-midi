@@ -4,7 +4,7 @@ import {
   Resizable,
   Sortable,
   Table,
-} from "https://cdn.jsdelivr.net/npm/@marmooo/table@0.0.4/+esm";
+} from "https://cdn.jsdelivr.net/npm/@marmooo/table@0.0.5/+esm";
 
 const DEFAULT_MIDI_DB = "https://midi-db.pages.dev";
 const DEFAULT_INSTRUMENT_GROUPS = [
@@ -307,7 +307,7 @@ export class MidiLibrary {
         visible: true,
         searchPlaceholder: false,
         renderHeader(th) {
-          th.style.width = "32px";
+          th.style.width = "37px";
         },
         render: (row, td) => this.renderToolbar(row, td),
       },

@@ -305,10 +305,8 @@ export class MidiLibrary {
         id: "_toolbar",
         name: "",
         visible: true,
+        width: 37,
         searchPlaceholder: false,
-        renderHeader(th) {
-          th.style.width = "37px";
-        },
         render: (row, td) => this.renderToolbar(row, td),
       },
       {

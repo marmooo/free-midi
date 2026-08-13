@@ -16,13 +16,13 @@ const DEFAULT_INSTRUMENT_GROUPS = [
   { label: "Sax", numbers: [64, 65, 66, 67] },
 ];
 const ICON_SELECT =
-  `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+  `<svg viewBox="0 0 24 24" width="1rem" height="1rem" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
 const ICON_PLAYING =
-  `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>`;
+  `<svg viewBox="0 0 24 24" width="1rem" height="1rem" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>`;
 const ICON_PAUSED =
-  `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>`;
+  `<svg viewBox="0 0 24 24" width="1rem" height="1rem" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>`;
 const ICON_DATALIST =
-  `<svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm4 4a.5.5 0 0 0-.374.832l4 4.5a.5.5 0 0 0 .748 0l4-4.5A.5.5 0 0 0 12 6z"></path></svg>`;
+  `<svg viewBox="0 0 16 16" width="1rem" height="1rem" fill="currentColor"><path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm4 4a.5.5 0 0 0-.374.832l4 4.5a.5.5 0 0 0 .748 0l4-4.5A.5.5 0 0 0 12 6z"></path></svg>`;
 
 function resolveElement(target) {
   if (!target) return null;
@@ -307,7 +307,7 @@ export class MidiLibrary {
         id: "_toolbar",
         name: "",
         visible: true,
-        width: 37,
+        width: 28,
         searchPlaceholder: false,
         render: (row, td) => this.renderToolbar(row, td),
       },

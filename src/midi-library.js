@@ -21,6 +21,8 @@ const ICON_PLAYING =
   `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>`;
 const ICON_PAUSED =
   `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>`;
+const ICON_DATALIST =
+  `<svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm4 4a.5.5 0 0 0-.374.832l4 4.5a.5.5 0 0 0 .748 0l4-4.5A.5.5 0 0 0 12 6z"></path></svg>`;
 
 function resolveElement(target) {
   if (!target) return null;
@@ -414,6 +416,47 @@ export class MidiLibrary {
     ];
   }
 
+  /**
+   * On tablets the native datalist dropdown indicator is often hidden.
+   * Add an explicit button that calls input.showPicker() so users can open
+   * the collection (HP) suggestions list.
+   */
+  enhanceDatalistSearchInputs() {
+    if (!this.tableContainer) return;
+    const inputs = this.tableContainer.querySelectorAll(
+      "thead input[data-column-id][list]",
+    );
+    inputs.forEach((input) => {
+      if (input.dataset.midiLibraryPickerEnhanced) return;
+      input.dataset.midiLibraryPickerEnhanced = "1";
+
+      const th = input.closest("th");
+      if (!th) return;
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "d-flex align-items-center gap-1";
+      wrapper.style.minWidth = "0";
+
+      input.classList.add("flex-grow-1");
+      input.style.minWidth = "0";
+      th.insertBefore(wrapper, input);
+      wrapper.appendChild(input);
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "btn btn-sm p-0 midi-library-datalist-picker";
+      button.title = "Show suggestions";
+      button.setAttribute("aria-label", "Show suggestions");
+      button.innerHTML = ICON_DATALIST;
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        input.showPicker();
+      });
+      wrapper.appendChild(button);
+    });
+  }
+
   setTable(data) {
     this.fullData = data;
     const columns = this.buildColumns();
@@ -440,6 +483,7 @@ export class MidiLibrary {
     ];
     table.render(this.tableContainer);
     this.table = table;
+    this.enhanceDatalistSearchInputs();
     if (this.activeRow) this.setActiveRow(this.activeRow);
   }
 

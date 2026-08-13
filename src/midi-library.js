@@ -451,6 +451,7 @@ export class MidiLibrary {
       button.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
+        input.value = "";
         input.showPicker();
       });
       wrapper.appendChild(button);

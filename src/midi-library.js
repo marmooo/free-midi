@@ -484,6 +484,16 @@ export class MidiLibrary {
     ];
     table.render(this.tableContainer);
     this.table = table;
+
+    // Re-run after full re-renders (column toggle rebuilds thead and drops
+    // the datalist picker buttons that were injected into the old DOM).
+    const originalUpdate = table.update.bind(table);
+    table.update = () => {
+      const result = originalUpdate();
+      this.enhanceDatalistSearchInputs();
+      return result;
+    };
+
     this.enhanceDatalistSearchInputs();
     if (this.activeRow) this.setActiveRow(this.activeRow);
   }

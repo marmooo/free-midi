@@ -418,8 +418,8 @@ export class MidiLibrary {
 
   /**
    * On tablets the native datalist dropdown indicator is often hidden.
-   * Add an explicit button that calls input.showPicker() so users can open
-   * the collection (HP) suggestions list.
+   * Add an explicit button that opens a simple selectable list so users can
+   * see the collection (HP) suggestions list.
    */
   enhanceDatalistSearchInputs() {
     if (!this.tableContainer) return;
@@ -452,10 +452,98 @@ export class MidiLibrary {
         event.preventDefault();
         event.stopPropagation();
         input.value = "";
-        input.showPicker();
+        // TODO: iOS is not supported, and it's difficult to use on other OS as well.
+        // input.showPicker();
+        this.showDatalist(input);
       });
       wrapper.appendChild(button);
     });
+  }
+
+  closeDatalist() {
+    if (this.datalistMenu) {
+      this.datalistMenu.remove();
+      this.datalistMenu = null;
+    }
+    if (this.handleDatalistOutsideClick) {
+      document.removeEventListener("click", this.handleDatalistOutsideClick);
+      this.handleDatalistOutsideClick = null;
+    }
+  }
+
+  /**
+   * Simple dropdown for selecting a value from the input's associated
+   * <datalist>. Used instead of input.showPicker(), which is unreliable
+   * on iOS and inconsistent across other browsers too.
+   */
+  showDatalist(input) {
+    this.closeDatalist();
+
+    const datalist = input.list;
+    if (!datalist) return;
+
+    const options = [];
+    for (let i = 0; i < datalist.options.length; i++) {
+      const value = datalist.options[i].value;
+      if (value) options.push(value);
+    }
+    if (options.length === 0) return;
+
+    const viewportWidth = document.documentElement.clientWidth;
+    const menuMargin = 8;
+    const maxMenuWidth = viewportWidth - menuMargin * 2;
+    const minMenuWidth = 200;
+    const menuWidth = Math.min(
+      Math.max(input.offsetWidth, minMenuWidth),
+      maxMenuWidth,
+    );
+
+    const menu = document.createElement("div");
+    menu.className = "list-group midi-library-datalist-menu shadow-sm";
+    menu.style.position = "absolute";
+    menu.style.zIndex = "1000";
+    menu.style.maxHeight = "240px";
+    menu.style.overflowY = "auto";
+    menu.style.width = `${menuWidth}px`;
+
+    for (let i = 0; i < options.length; i++) {
+      const value = options[i];
+      const item = document.createElement("button");
+      item.type = "button";
+      item.className = "list-group-item list-group-item-action py-1 px-2";
+      item.style.whiteSpace = "normal";
+      item.style.wordBreak = "break-word";
+      item.style.textAlign = "left";
+      item.textContent = value;
+      item.addEventListener("click", () => {
+        input.value = value;
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+        this.closeDatalist();
+      });
+      menu.appendChild(item);
+    }
+
+    document.body.appendChild(menu);
+    const rect = input.getBoundingClientRect();
+    const maxLeft = viewportWidth - menuWidth - menuMargin;
+    const left = Math.min(
+      Math.max(rect.left, menuMargin),
+      Math.max(maxLeft, menuMargin),
+    );
+    menu.style.top = `${rect.bottom + globalThis.scrollY}px`;
+    menu.style.left = `${left + globalThis.scrollX}px`;
+
+    this.datalistMenu = menu;
+    this.handleDatalistOutsideClick = (event) => {
+      if (!menu.contains(event.target) && event.target !== input) {
+        this.closeDatalist();
+      }
+    };
+    // Defer so the click that opened the menu doesn't immediately close it.
+    setTimeout(() => {
+      document.addEventListener("click", this.handleDatalistOutsideClick);
+    }, 0);
   }
 
   setTable(data) {
@@ -499,6 +587,7 @@ export class MidiLibrary {
   }
 
   destroy() {
+    this.closeDatalist();
     this.tableContainer.innerHTML = "";
     if (this.paginationContainer) this.paginationContainer.innerHTML = "";
     if (this.columnsContainer) this.columnsContainer.innerHTML = "";

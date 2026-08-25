@@ -501,7 +501,7 @@ export class MidiLibrary {
     const menu = document.createElement("div");
     menu.className = "list-group midi-library-datalist-menu shadow-sm";
     menu.style.position = "absolute";
-    menu.style.zIndex = "1000";
+    menu.style.zIndex = "10000";
     menu.style.maxHeight = "240px";
     menu.style.overflowY = "auto";
     menu.style.width = `${menuWidth}px`;

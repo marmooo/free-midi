@@ -1,4 +1,4 @@
-import { Midy } from "https://cdn.jsdelivr.net/gh/marmooo/midy@0.6.2/dist/midy.min.js";
+import { Midy } from "https://cdn.jsdelivr.net/gh/marmooo/midy@0.6.3/dist/midy.min.js";
 import { MIDIPlayer } from "https://cdn.jsdelivr.net/npm/@marmooo/midi-player@0.0.8/+esm";
 import { Modal } from "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/+esm";
 import { MidiLibrary } from "/free-midi/midi-library.js";
@@ -192,6 +192,71 @@ class PlaybackController {
   }
 }
 
+// iOS/Safari suspends (or "interrupts") the AudioContext when the tab goes
+// to the background, and calling resume() from a non-user-gesture callback
+// (like visibilitychange) is unreliable there. This sets up: (1) an
+// automatic resume attempt on return-to-foreground, (2) a UI state sync so
+// the player doesn't look "stuck" on playing while actually silent, and (3)
+// a one-time tap-to-resume fallback for when the automatic resume is
+// rejected by iOS.
+function setBackgroundRecoveryEvents(audioContext, midy, midiPlayer, library) {
+  let resumeOnGestureAttached = false;
+
+  function attachResumeOnGesture() {
+    if (resumeOnGestureAttached) return;
+    resumeOnGestureAttached = true;
+    const resumeOnce = async () => {
+      document.removeEventListener("touchend", resumeOnce);
+      document.removeEventListener("mousedown", resumeOnce);
+      resumeOnGestureAttached = false;
+      try {
+        if (audioContext.state !== "running") await audioContext.resume();
+      } catch (error) {
+        console.error("Failed to resume AudioContext on gesture:", error);
+      }
+    };
+    document.addEventListener("touchend", resumeOnce);
+    document.addEventListener("mousedown", resumeOnce);
+  }
+
+  audioContext.addEventListener("statechange", () => {
+    // "interrupted" is a Safari-only state (e.g. phone call, Siri, another
+    // app taking the audio session) that behaves like "suspended" but is
+    // not part of the standard AudioContextState type elsewhere.
+    if (
+      audioContext.state === "suspended" || audioContext.state === "interrupted"
+    ) {
+      if (midy.isPlaying && !midy.isPaused) {
+        library.setPlayState("paused");
+      }
+    }
+  });
+
+  document.addEventListener("visibilitychange", async () => {
+    if (document.visibilityState !== "visible") return;
+    if (audioContext.state === "closed") {
+      // Some iOS versions can hard-close the context after a long
+      // background period; it can no longer be resumed.
+      console.error(
+        "AudioContext was closed while backgrounded; reload required.",
+      );
+      return;
+    }
+    if (audioContext.state === "running") return;
+    try {
+      await audioContext.resume();
+    } catch (error) {
+      console.error("Automatic AudioContext resume failed:", error);
+    }
+    if (audioContext.state !== "running") {
+      // iOS rejected the gesture-less resume; wait for the next tap/click.
+      attachResumeOnGesture();
+    } else if (midy.isPlaying) {
+      library.setPlayState("playing");
+    }
+  });
+}
+
 async function getSampleSoundFontList() {
   const root = document.getElementById("sampleSoundFont");
   const response = await fetch("https://soundfonts.pages.dev/list.json");
@@ -279,6 +344,7 @@ await library.load();
 setFilterInstrumentsEvents(library);
 setConfigurationEvents();
 setSoundFontLibraryEvents();
+setBackgroundRecoveryEvents(audioContext, midy, midiPlayer, library);
 
 new Modal(document.getElementById("soundfontModal"));
 

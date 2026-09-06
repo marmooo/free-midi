@@ -1,4 +1,4 @@
-import { Midy } from "https://cdn.jsdelivr.net/gh/marmooo/midy@0.6.4/dist/midy.min.js";
+import { Midy } from "https://cdn.jsdelivr.net/gh/marmooo/midy@0.6.5/dist/midy.min.js";
 import { MIDIPlayer } from "https://cdn.jsdelivr.net/npm/@marmooo/midi-player@0.0.8/+esm";
 import { Modal } from "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/+esm";
 import { MidiLibrary } from "/free-midi/midi-library.js";
@@ -264,7 +264,7 @@ async function getSampleSoundFontList() {
   let html = "";
   for (let i = 0; i < list.length; i++) {
     const soundFont = list[i];
-    const checked = (soundFont.name === "GeneralUser_GS_v1.471")
+    const checked = (soundFont.name === "GeneralUser_GS_v2.0.3")
       ? "checked"
       : "";
     const license = (soundFont.license.startsWith("http"))
@@ -329,7 +329,6 @@ midiPlayer.applyTheme(getGlobalCSS(), {
   "midi-player-range": "form-range",
 });
 document.getElementById("midi-player").appendChild(midiPlayer.root);
-await midy.loadSoundFont(`${midiPlayer.soundFontURL}/000.sf3`);
 
 const playbackController = new PlaybackController(
   midy,

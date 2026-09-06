@@ -169,9 +169,20 @@ export class MidiLibrary {
       radio.autocomplete = "off";
 
       const label = document.createElement("label");
-      label.className = collection.status === "CLOSED"
-        ? "btn btn-sm btn-outline-secondary"
-        : "btn btn-sm btn-outline-primary";
+      switch (collection.status) {
+        case "CLOSED":
+          label.className = "btn btn-sm btn-outline-secondary";
+          break;
+        case "MOVED":
+          label.className = "btn btn-sm btn-outline-danger";
+          break;
+        default:
+          if (collection.web.startsWith("https")) {
+            label.className = "btn btn-sm btn-outline-primary";
+          } else {
+            label.className = "btn btn-sm btn-outline-info";
+          }
+      }
       label.htmlFor = id;
       label.textContent = collection.name;
 

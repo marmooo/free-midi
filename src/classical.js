@@ -305,7 +305,7 @@ const configuration = {
   reverbType: 4,
   chorusType: 1,
 };
-const midiDB = "/classical-midi-db";
+const midiDB = "https://marmooo.github.io/classical-midi-db";
 
 const library = new FreeMidiLibrary({
   table: "table",

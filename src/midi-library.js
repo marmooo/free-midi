@@ -21,6 +21,8 @@ const ICON_PLAYING =
   `<svg viewBox="0 0 24 24" width="1rem" height="1rem" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>`;
 const ICON_PAUSED =
   `<svg viewBox="0 0 24 24" width="1rem" height="1rem" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>`;
+const ICON_EXTERNAL =
+  `<svg viewBox="0 0 16 16" width="1rem" height="1rem" fill="currentColor"><path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5"/><path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z"/></svg>`;
 const ICON_DATALIST =
   `<svg viewBox="0 0 16 16" width="1rem" height="1rem" fill="currentColor"><path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm4 4a.5.5 0 0 0-.374.832l4 4.5a.5.5 0 0 0 .748 0l4-4.5A.5.5 0 0 0 12 6z"></path></svg>`;
 
@@ -63,6 +65,12 @@ export class MidiLibrary {
    * @param {(row: object) => (void|Promise<void>)} options.onSelect
    *        Called when the row selection button is clicked. `row` contains
    *        column data such as file, title, and composer.
+   * @param {boolean} [options.showExternalApps=false] - Show the external app
+   *        button next to the select button (default: hidden)
+   * @param {(row: object) => (void|Promise<void>)} [options.onExternalApp]
+   *        Called when the external app button is clicked.
+   * @param {string} [options.externalAppLabel] - Tooltip / aria-label of the
+   *        external app button
    */
   constructor(options = {}) {
     if (!options.table) {
@@ -75,6 +83,9 @@ export class MidiLibrary {
     this.instrumentGroups = options.instrumentGroups ??
       DEFAULT_INSTRUMENT_GROUPS;
     this.onSelect = options.onSelect ?? (() => {});
+    this.showExternalApps = options.showExternalApps ?? false;
+    this.onExternalApp = options.onExternalApp ?? (() => {});
+    this.externalAppLabel = options.externalAppLabel ?? "Open in external app";
 
     this.tableContainer = resolveElement(options.table);
     this.paginationContainer = resolveElement(options.pagination);
@@ -246,6 +257,45 @@ export class MidiLibrary {
     button.innerHTML = ICON_SELECT;
     button.addEventListener("click", () => this.handleSelect(row, button));
     td.appendChild(button);
+
+    if (this.showExternalApps && this.canOpenExternally(row)) {
+      const externalButton = document.createElement("button");
+      externalButton.type = "button";
+      externalButton.className =
+        "btn btn-sm p-0 ms-1 midi-library-external-button";
+      externalButton.title = this.externalAppLabel;
+      externalButton.setAttribute("aria-label", this.externalAppLabel);
+      externalButton.innerHTML = ICON_EXTERNAL;
+      externalButton.addEventListener("click", () => this.onExternalApp(row));
+      td.appendChild(externalButton);
+    }
+  }
+
+  // Collections that do not allow redistribution are not offered for direct
+  // download, so they are not handed over to external apps either.
+  canOpenExternally(row) {
+    const id = row.file.split("/")[0];
+    return this.collections.get(id)?.redistribution == undefined;
+  }
+
+  /**
+   * Build the URL used to open `row` in an external app.
+   * The MIDI file and its metadata are passed as query parameters
+   * (url, title, composer, maintainer, web, license).
+   * @param {string} appURL - Base URL of the external app
+   * @param {object} row - Table row of the selected MIDI
+   * @param {string} [urlParam="url"] - Name of the parameter that carries the
+   *        MIDI file URL (tools use "url", games use "q")
+   */
+  toExternalAppURL(appURL, row, urlParam = "url") {
+    const url = new URL(appURL, globalThis.location.href);
+    url.searchParams.set(urlParam, `${this.midiDB}/${row.file}`);
+    const fields = ["title", "composer", "maintainer", "web", "license"];
+    for (let i = 0; i < fields.length; i++) {
+      const value = row[fields[i]];
+      if (value) url.searchParams.set(fields[i], value);
+    }
+    return url.href;
   }
 
   async handleSelect(row) {
@@ -318,7 +368,7 @@ export class MidiLibrary {
         id: "_toolbar",
         name: "",
         visible: true,
-        width: 28,
+        width: this.showExternalApps ? 52 : 28,
         searchPlaceholder: false,
         render: (row, td) => this.renderToolbar(row, td),
       },

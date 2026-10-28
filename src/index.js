@@ -30,6 +30,110 @@ function getGlobalCSS() {
   return sheet;
 }
 
+function getExternalAppLabel() {
+  return document.documentElement.lang === "ja"
+    ? "外部アプリで開く"
+    : "Open in external app";
+}
+
+// Reuse the "MIDI Apps" table in the footer as the single source of the app list.
+function collectExternalApps() {
+  const apps = [];
+  const table = document.getElementById("midiApps");
+  if (!table) return apps;
+  const rows = table.querySelectorAll("tbody tr");
+  for (let i = 0; i < rows.length; i++) {
+    const cells = rows[i].querySelectorAll("td");
+    if (cells.length < 2) continue;
+    const anchor = cells[0].querySelector("a");
+    if (!anchor) continue;
+    // Free MIDI itself cannot be an external app.
+    if (new URL(anchor.href).pathname.startsWith("/free-midi/")) continue;
+    const img = cells[0].querySelector("img");
+    apps.push({
+      name: anchor.textContent.trim(),
+      url: anchor.href,
+      favicon: img ? img.src : "",
+      description: cells[1].textContent.trim(),
+    });
+  }
+  return apps;
+}
+
+class ExternalAppModal {
+  constructor(element, apps, library) {
+    this.modal = new Modal(element);
+    this.library = library;
+    this.titleElement = document.getElementById("externalAppTitle");
+    // Each entry: { link, url, urlParam }. Tools are built from the footer
+    // table and receive the MIDI as ?url=. Games are written in the modal
+    // markup and declare their parameter with data-url-param (?q=).
+    this.entries = [];
+
+    const list = document.getElementById("externalAppList");
+    for (let i = 0; i < apps.length; i++) {
+      const app = apps[i];
+      const link = document.createElement("a");
+      link.className =
+        "list-group-item list-group-item-action d-flex align-items-center gap-2";
+      link.href = app.url;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.addEventListener("click", () => this.modal.hide());
+
+      if (app.favicon) {
+        const img = document.createElement("img");
+        img.className = "favicon";
+        img.alt = "";
+        img.src = app.favicon;
+        img.width = 16;
+        img.height = 16;
+        link.appendChild(img);
+      }
+
+      const text = document.createElement("div");
+      const name = document.createElement("div");
+      name.className = "fw-semibold";
+      name.textContent = app.name;
+      const description = document.createElement("small");
+      description.className = "text-body-secondary";
+      description.textContent = app.description;
+      text.appendChild(name);
+      text.appendChild(description);
+      link.appendChild(text);
+
+      list.appendChild(link);
+      this.entries.push({ link, url: app.url, urlParam: "url" });
+    }
+
+    const gameLinks = document.querySelectorAll("#externalGameList a");
+    for (let i = 0; i < gameLinks.length; i++) {
+      const link = gameLinks[i];
+      link.addEventListener("click", () => this.modal.hide());
+      this.entries.push({
+        link,
+        url: link.href,
+        urlParam: link.dataset.urlParam ?? "url",
+      });
+    }
+  }
+
+  open(row) {
+    let title = row.title ?? "";
+    if (row.composer) title = `${row.composer} - ${title}`;
+    this.titleElement.textContent = title;
+    for (let i = 0; i < this.entries.length; i++) {
+      const entry = this.entries[i];
+      entry.link.href = this.library.toExternalAppURL(
+        entry.url,
+        row,
+        entry.urlParam,
+      );
+    }
+    this.modal.show();
+  }
+}
+
 function setConfigurationEvents() {
   document.getElementById("configuration").addEventListener(
     "change",
@@ -313,6 +417,8 @@ const library = new FreeMidiLibrary({
   columns: "columns",
   collections: "collections",
   midiDB,
+  showExternalApps: true,
+  externalAppLabel: getExternalAppLabel(),
 });
 
 await getSampleSoundFontList();
@@ -337,6 +443,13 @@ const playbackController = new PlaybackController(
   library,
 );
 library.onSelect = (row) => playbackController.play(row);
+
+const externalAppModal = new ExternalAppModal(
+  document.getElementById("externalAppModal"),
+  collectExternalApps(),
+  library,
+);
+library.onExternalApp = (row) => externalAppModal.open(row);
 
 await library.load();
 

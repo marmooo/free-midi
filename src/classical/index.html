@@ -43,7 +43,8 @@
         background-color: var(--bs-tertiary-bg);
       }
 
-      .midi-library-select-button {
+      .midi-library-select-button,
+      .midi-library-external-button {
         color: inherit;
       }
 
@@ -413,7 +414,7 @@
       <div class="d-flex justify-content-center text-start flex-wrap">
         <div class="table-responsive text-nowrap">
           <h6>MIDI Apps</h6>
-          <table class="table table-sm table-striped w-auto">
+          <table id="midiApps" class="table table-sm table-striped w-auto">
             <tbody>
               <tr>
                 <td>
@@ -531,6 +532,48 @@
         </div>
       </div>
     </div>
+    <div class="modal" id="externalAppModal" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Open in MIDI App</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p id="externalAppTitle" class="fw-semibold text-break"></p>
+            <h6 class="text-body-secondary">Tools</h6>
+            <div id="externalAppList" class="list-group mb-3"></div>
+            <h6 class="text-body-secondary">Games</h6>
+            <div id="externalGameList" class="list-group">
+              <a class="list-group-item list-group-item-action d-flex align-items-center gap-2" href="https://marmooo.github.io/tip-tap-notes/" data-url-param="q" target="_blank" rel="noopener">
+                <img class="favicon" alt="" src="https://marmooo.github.io/tip-tap-notes/favicon/favicon.svg" width="16" height="16" loading="lazy">
+                <div>
+                  <div class="fw-semibold">Tip Tap Notes</div>
+                  <small class="text-body-secondary">Rhythm game with tap notes.</small>
+                </div>
+              </a>
+              <a class="list-group-item list-group-item-action d-flex align-items-center gap-2" href="https://marmooo.github.io/flip-flap-notes/" data-url-param="q" target="_blank" rel="noopener">
+                <img class="favicon" alt="" src="https://marmooo.github.io/flip-flap-notes/favicon/favicon.svg" width="16" height="16" loading="lazy">
+                <div>
+                  <div class="fw-semibold">Flip Flap Notes</div>
+                  <small class="text-body-secondary">Rhythm game with tap, hold, release and trace notes.</small>
+                </div>
+              </a>
+              <a class="list-group-item list-group-item-action d-flex align-items-center gap-2" href="https://marmooo.github.io/zip-zap-notes/" data-url-param="q" target="_blank" rel="noopener">
+                <img class="favicon" alt="" src="https://marmooo.github.io/zip-zap-notes/favicon/favicon.svg" width="16" height="16" loading="lazy">
+                <div>
+                  <div class="fw-semibold">Zip Zap Notes</div>
+                  <small class="text-body-secondary">Dodging game. Avoid the falling blocks.</small>
+                </div>
+              </a>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="drop-inline-css
       btn bg-light-subtle p-1 form-range
       modal-backdrop show gap-1
@@ -538,7 +581,7 @@
       pagination page-item page-link active
       btn-check btn btn-sm btn-outline-primary btn-outline-secondary btn-outline-danger btn-outline-info m-1
       list-group shadow-sm list-group-item py-1 px-2
-      d-none"></div>
+      d-none ms-1 p-0 d-flex align-items-center gap-2 fw-semibold text-body-secondary list-group-item-action mb-3"></div>
     <script type="module" src="/free-midi/classical.js"></script>
   </body>
 </html>

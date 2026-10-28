@@ -258,7 +258,7 @@ export class MidiLibrary {
     button.addEventListener("click", () => this.handleSelect(row, button));
     td.appendChild(button);
 
-    if (this.showExternalApps && this.canOpenExternally(row)) {
+    if (this.showExternalApps) {
       const externalButton = document.createElement("button");
       externalButton.type = "button";
       externalButton.className =
@@ -269,13 +269,6 @@ export class MidiLibrary {
       externalButton.addEventListener("click", () => this.onExternalApp(row));
       td.appendChild(externalButton);
     }
-  }
-
-  // Collections that do not allow redistribution are not offered for direct
-  // download, so they are not handed over to external apps either.
-  canOpenExternally(row) {
-    const id = row.file.split("/")[0];
-    return this.collections.get(id)?.redistribution == undefined;
   }
 
   /**

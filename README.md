@@ -1,7 +1,8 @@
-# free-midi
+# Free MIDI
 
-[Free MIDI Search](https://marmooo.github.io/free-midi/) for everyone. Free to
-listen, copy, play, etc.
+Free MIDI Music from Around the World. Discover MIDI files with verified
+licenses across genres. Explore a vast collection of music and listen to songs
+online for free.
 
 This repository deals only with MIDI that can be freely listen, copy, play, etc.
 Old music is managed according to the longest protection period in the world to

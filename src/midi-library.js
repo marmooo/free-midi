@@ -114,8 +114,11 @@ export class MidiLibrary {
   }
 
   complementTable(info, data) {
-    const { name, country, composer, maintainer, web, license } = info;
-    data.forEach((datum) => {
+    const { id, name, country, composer, maintainer, web, license } = info;
+    data.forEach((datum, index) => {
+      // 共有URL短縮用: コレクション内の安定した連番（JSON配列順）
+      datum.index = index;
+      datum.collectionId = id;
       if (!datum.collection) datum.collection = name;
       if (!datum.country && country) datum.country = country;
       if (!datum.composer && composer) datum.composer = composer;
@@ -273,21 +276,24 @@ export class MidiLibrary {
 
   /**
    * Build the URL used to open `row` in an external app.
-   * The MIDI file and its metadata are passed as query parameters
-   * (url, title, composer, maintainer, web, license).
+   * 全外部アプリ共通で短い形式 ?c=<collectionId>&i=<index> を使う。
+   * classical など別 DB のときだけ &db=c を付ける。
+   *
    * @param {string} appURL - Base URL of the external app
    * @param {object} row - Table row of the selected MIDI
-   * @param {string} [urlParam="url"] - Name of the parameter that carries the
-   *        MIDI file URL (tools use "url", games use "q")
+   * @param {string} [_urlParam] - 互換のため残す（未使用）
    */
-  toExternalAppURL(appURL, row, urlParam = "url") {
+  toExternalAppURL(appURL, row, _urlParam = "url") {
     const url = new URL(appURL, globalThis.location.href);
-    url.searchParams.set(urlParam, `${this.midiDB}/${row.file}`);
-    const fields = ["title", "composer", "maintainer", "web", "license"];
-    for (let i = 0; i < fields.length; i++) {
-      const value = row[fields[i]];
-      if (value) url.searchParams.set(fields[i], value);
+    const collectionId = row.collectionId ||
+      String(row.file || "").split("/")[0] || "";
+    const index = Number.isInteger(row.index) ? row.index : 0;
+    url.searchParams.set("c", collectionId);
+    url.searchParams.set("i", String(index));
+    if (this.midiDB && !this.midiDB.includes("midi-db.pages.dev")) {
+      url.searchParams.set("db", "c");
     }
+    if (row.title) url.searchParams.set("title", row.title);
     return url.href;
   }
 

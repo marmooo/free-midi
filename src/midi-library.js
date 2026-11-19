@@ -71,6 +71,8 @@ export class MidiLibrary {
    *        Called when the external app button is clicked.
    * @param {string} [options.externalAppLabel] - Tooltip / aria-label of the
    *        external app button
+   * @param {boolean} [options.excludeNonRedistributable=false]
+   *        true のとき redistribution === false のコレクションを表示対象から除外する
    */
   constructor(options = {}) {
     if (!options.table) {
@@ -86,6 +88,7 @@ export class MidiLibrary {
     this.showExternalApps = options.showExternalApps ?? false;
     this.onExternalApp = options.onExternalApp ?? (() => {});
     this.externalAppLabel = options.externalAppLabel ?? "Open in external app";
+    this.excludeNonRedistributable = options.excludeNonRedistributable ?? false;
 
     this.tableContainer = resolveElement(options.table);
     this.paginationContainer = resolveElement(options.pagination);
@@ -101,7 +104,10 @@ export class MidiLibrary {
   }
 
   async load() {
-    const data = await this.fetchCollections();
+    let data = await this.fetchCollections();
+    if (this.excludeNonRedistributable) {
+      data = data.filter((datum) => datum.redistribution !== false);
+    }
     data.forEach((datum) => this.collections.set(datum.id, datum));
     if (this.collectionsContainer) this.renderCollectionSelector();
     if (this.instrumentsContainer) this.renderInstrumentButtons();

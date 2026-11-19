@@ -418,6 +418,7 @@ const library = new FreeMidiLibrary({
   collections: "collections",
   midiDB,
   showExternalApps: true,
+  excludeNonRedistributable: true,
   externalAppLabel: getExternalAppLabel(),
 });
 
